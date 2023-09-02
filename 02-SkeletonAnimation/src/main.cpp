@@ -49,6 +49,7 @@ Shader shaderSkybox;
 Shader shaderMulLighting;
 
 std::shared_ptr<FirstPersonCamera> camera(new FirstPersonCamera());
+	// Se crea una nueva cámara viendo hacia -Z ya que "YAW	-90.0f" y "PITCH 0.0f"
 
 Sphere skyboxSphere(20, 20);
 Box boxCesped;
@@ -64,6 +65,8 @@ Model modelEclipseRearWheels;
 Model modelEclipseFrontalWheels;
 Model modelHeliChasis;
 Model modelHeliHeli;
+Model modelHeliRear;
+
 Model modelLambo;
 Model modelLamboLeftDor;
 Model modelLamboRightDor;
@@ -93,12 +96,21 @@ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
 GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 GL_TEXTURE_CUBE_MAP_NEGATIVE_Z };
 
-std::string fileNames[6] = { "../Textures/mp_bloodvalley/blood-valley_ft.tga",
-		"../Textures/mp_bloodvalley/blood-valley_bk.tga",
-		"../Textures/mp_bloodvalley/blood-valley_up.tga",
-		"../Textures/mp_bloodvalley/blood-valley_dn.tga",
-		"../Textures/mp_bloodvalley/blood-valley_rt.tga",
-		"../Textures/mp_bloodvalley/blood-valley_lf.tga" };
+std::string fileNames[6] = { 
+		"../Textures/belfast_sunset_puresky/puresky_ft.tga",
+		"../Textures/belfast_sunset_puresky/puresky_bk.tga",
+		"../Textures/belfast_sunset_puresky/puresky_up.tga",
+		"../Textures/belfast_sunset_puresky/puresky_dn.tga",
+		"../Textures/belfast_sunset_puresky/puresky_rt.tga",
+		"../Textures/belfast_sunset_puresky/puresky_lf.tga" };
+
+// std::string fileNames[6] = { 
+// 		"../Textures/testsky_up_no_rle_compression/test_ft.tga",
+// 		"../Textures/testsky_up_no_rle_compression/test_bk.tga",
+// 		"../Textures/testsky_up_no_rle_compression/test_up.tga",
+// 		"../Textures/testsky_up_no_rle_compression/test_dn.tga",
+// 		"../Textures/testsky_up_no_rle_compression/test_rt.tga",
+// 		"../Textures/testsky_up_no_rle_compression/test_lf.tga" };
 
 bool exitApp = false;
 int lastMousePosX, offsetX = 0;
@@ -252,6 +264,8 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelHeliChasis.setShader(&shaderMulLighting);
 	modelHeliHeli.loadModel("../models/Helicopter/Mi_24_heli.obj");
 	modelHeliHeli.setShader(&shaderMulLighting);
+	modelHeliRear.loadModel("../models/Helicopter/Mi_23_heli_rear.obj");
+	modelHeliRear.setShader(&shaderMulLighting);
 	// Lamborginhi
 	modelLambo.loadModel("../models/Lamborginhi_Aventador_OBJ/Lamborghini_Aventador_chasis.obj");
 	modelLambo.setShader(&shaderMulLighting);
@@ -485,6 +499,7 @@ void destroy() {
 	modelEclipseRearWheels.destroy();
 	modelHeliChasis.destroy();
 	modelHeliHeli.destroy();
+	modelHeliRear.destroy();
 	modelLambo.destroy();
 	modelLamboFrontLeftWheel.destroy();
 	modelLamboFrontRightWheel.destroy();
@@ -660,18 +675,21 @@ bool processInput(bool continueApplication) {
 	return continueApplication;
 }
 
+// Debtro tiene in while que se ejecuta a menus que ocurra un evento como cerrar la venta o presionar scape.
 void applicationLoop() {
 	bool psi = true;
 
 	modelMatrixEclipse = glm::translate(modelMatrixEclipse, glm::vec3(27.5, 0, 30.0));
 	modelMatrixEclipse = glm::rotate(modelMatrixEclipse, glm::radians(180.0f), glm::vec3(0, 1, 0));
 	int state = 0;
-	float advanceCount = 0.0;
+	float advanceCount = 0.0; // Infica cuánto hemos avanzado
 	float rotCount = 0.0;
 	float rotWheelsX = 0.0;
 	float rotWheelsY = 0.0;
-	int numberAdvance = 0;
+	int numberAdvance = 0; // Indica el recorrido que estamos haciendo
 	int maxAdvance = 0.0;
+	const float avanceEclipse = 0.1; // Velocidad de avance
+	const float rotEclipse = 0.5; // Velocidad de giro
 
 	matrixModelRock = glm::translate(matrixModelRock, glm::vec3(-3.0, 0.0, 2.0));
 
@@ -899,7 +917,7 @@ void applicationLoop() {
 		modelEclipseRearWheels.render(modelMatrixRearWheels);
 
 		// Helicopter
-		glm::mat4 modelMatrixHeliChasis = glm::mat4(modelMatrixHeli);
+		glm::mat4 modelMatrixHeliChasis = glm::mat4(modelMatrixHeli); // No se debe hacer un escalamiento sobre la matriz gobal modelMatrixHeli, solo sobre as matrices específicas 
 		modelHeliChasis.render(modelMatrixHeliChasis);
 
 		glm::mat4 modelMatrixHeliHeli = glm::mat4(modelMatrixHeliChasis);
@@ -907,6 +925,12 @@ void applicationLoop() {
 		modelMatrixHeliHeli = glm::rotate(modelMatrixHeliHeli, rotHelHelY, glm::vec3(0, 1, 0));
 		modelMatrixHeliHeli = glm::translate(modelMatrixHeliHeli, glm::vec3(0.0, 0.0, 0.249548));
 		modelHeliHeli.render(modelMatrixHeliHeli);
+		
+		glm::mat4 modelMatrixHeliRear = glm::mat4(modelMatrixHeliChasis);
+		modelMatrixHeliRear = glm::translate(modelMatrixHeliRear,glm::vec3(0.412083, 2.09305, -5.64913)); // despivote
+		modelMatrixHeliRear = glm::rotate(modelMatrixHeliRear, rotHelHelY, glm::vec3(1,0,0));
+		modelMatrixHeliRear = glm::translate(modelMatrixHeliRear,glm::vec3(-0.412083, -2.09305, 5.64913)); // pivote
+		modelHeliRear.render(modelMatrixHeliRear);
 
 		// Lambo car
 		glDisable(GL_CULL_FACE);
@@ -997,6 +1021,74 @@ void applicationLoop() {
 		// Constantes de animaciones
 		rotHelHelY += 0.5;
 
+		//****************************************
+		// Máquinas de estados (helicóptero)
+		//****************************************
+		switch (state)
+		{
+		case 0: // Este caso determina cuánto avanzar
+			if(numberAdvance == 0)
+				maxAdvance = 65.0f;
+			else if (numberAdvance == 1)
+				maxAdvance = 49.0f;
+			else if (numberAdvance == 2)
+				maxAdvance = 44.5f;
+			else if (numberAdvance == 3)
+				maxAdvance = 49.0f;
+			else if (numberAdvance == 4)
+				maxAdvance = 44.5f;
+			state = 1;
+			break;
+		case 1: // Temos que hacer una tranformación geométrica
+			modelMatrixEclipse = glm::translate(modelMatrixEclipse, glm::vec3(0.0, 0.0, avanceEclipse));
+			advanceCount += avanceEclipse;
+			rotWheelsX += 0.025;// Rotación de las llantas
+			rotWheelsY -= 0.0025;
+			if(rotWheelsY < 0)
+				rotWheelsY = 0.0;
+			if(advanceCount > maxAdvance){
+				advanceCount = 0.0;
+				numberAdvance ++;
+				state = 2;
+				if(advanceCount > 4)
+					advanceCount = 1;
+			}
+			break;
+		case 2: // Rotación del Eclipse
+			modelMatrixEclipse = glm::translate(modelMatrixEclipse, glm::vec3(0,0,0.025));
+			modelMatrixEclipse = glm::rotate(modelMatrixEclipse, glm::radians(rotEclipse), glm::vec3(0.0f,1.0f,0.0f));
+			rotCount += rotEclipse;
+			rotWheelsY += 0.0025;
+			rotWheelsX += 0.025;
+			if(rotWheelsY > 0.25)
+				rotWheelsY = 0.25f;
+			if(rotCount > 90.0){
+				rotCount = 0;
+				state = 0;
+			}
+			break;
+		default:
+			break;
+		}
+
+		//****************************************
+		// Máquinas de estados (lambo)
+		//****************************************
+		switch (stateDoor)
+		{
+		case 0:
+			dorRotCount++;
+			if(dorRotCount > 75.0f)
+				stateDoor = 1;
+			break;
+		case 1:
+			dorRotCount--;
+			if(dorRotCount < 0.0f)
+				stateDoor = 0;
+			break;
+		default:
+			break;
+		}
 		glfwSwapBuffers(window);
 	}
 }
