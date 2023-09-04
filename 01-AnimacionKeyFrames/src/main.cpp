@@ -124,9 +124,9 @@ std::string fileName = "";
 bool record = false;
 
 // Joints interpolations Dart Lego
-std::vector<std::vector<float>> keyFramesDartJoints;
+std::vector<std::vector<float>> keyFramesDartJoints; // Es el arreglo de todas las articulaciones
 std::vector<std::vector<glm::mat4>> keyFramesDart;
-int indexFrameDartJoints = 0;
+int indexFrameDartJoints = 0; 
 int indexFrameDartJointsNext = 1;
 float interpolationDartJoints = 0.0;
 int maxNumPasosDartJoints = 20;
@@ -730,7 +730,7 @@ void applicationLoop() {
 		 * Propiedades Luz direccional
 		 *******************************************/
 		shaderMulLighting.setVectorFloat3("viewPos", glm::value_ptr(camera->getPosition()));
-		shaderMulLighting.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(0.3, 0.3, 0.3)));
+		shaderMulLighting.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(0.3, 0.3, 0.3))); // Luz global
 		shaderMulLighting.setVectorFloat3("directionalLight.light.diffuse", glm::value_ptr(glm::vec3(0.7, 0.7, 0.7)));
 		shaderMulLighting.setVectorFloat3("directionalLight.light.specular", glm::value_ptr(glm::vec3(0.9, 0.9, 0.9)));
 		shaderMulLighting.setVectorFloat3("directionalLight.direction", glm::value_ptr(glm::vec3(-1.0, 0.0, 0.0)));

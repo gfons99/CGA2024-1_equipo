@@ -31,7 +31,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 add_executable(02-SkeletonAnimation ./src/main.cpp)
-
+ 
 set_target_properties(02-SkeletonAnimation 
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "../../bin"
