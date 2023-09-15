@@ -101,6 +101,9 @@ Model modelBuzzLeftHand;
 Model modelBuzzHip;
 Model modelBuzzTorso;
 
+Model modelSpacesuit;
+Model modelGunship;
+
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;
 
@@ -140,6 +143,8 @@ glm::mat4 modelMatrixLambo = glm::mat4(1.0);
 glm::mat4 modelMatrixAircraft = glm::mat4(1.0);
 glm::mat4 modelMatrixDart = glm::mat4(1.0f);
 glm::mat4 modelMatrixBuzz = glm::mat4(1.0f);
+glm::mat4 modelMatrixSpacesuit = glm::mat4(1.0f);
+glm::mat4 modelMatrixGunship = glm::mat4(1.0f);
 
 // Variables de rotación de las artiulaciones
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
@@ -185,16 +190,19 @@ int numPasosBuzz = 0;
 float rotHelHelY = 0.0;
 float rotHelHelBack = 0.0;
 
-// Var animate lambo dor
+// Variales de animación de la puerta [LAMBO]
 int stateDoor = 0;
 float dorRotCount = 0.0;
+// Variables animacion maquina de estados [LAMBO]
+// const float avanceLambo = 0.1;
+// const float giroLambo = 0.5f;
 
 double deltaTime;
 double currTime, lastTime;
 
 // Variables animacion maquina de estados eclipse
-const float avance = 0.1;
-const float giroEclipse = 0.5f;
+// const float avance = 0.1;
+// const float giroEclipse = 0.5f;
 
 // Se definen todos las funciones.
 void reshapeCallback(GLFWwindow *Window, int widthRes, int heightRes);
@@ -284,6 +292,10 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	esfera1.init();
 	esfera1.setShader(&shaderMulLighting);
 
+	// ****************************************************************
+	// CARGA DE MODELOS
+	// ****************************************************************
+
 	modelRock.loadModel("../models/rock/rock.obj");
 	modelRock.setShader(&shaderMulLighting);
 
@@ -304,7 +316,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelHeliHeli.setShader(&shaderMulLighting);
 	modelHeliRear.loadModel("../models/Helicopter/Mi_23_heli_rear.obj");
 	modelHeliRear.setShader(&shaderMulLighting);
-	// Lamborginhi
+	// [LAMBO]
 	modelLambo.loadModel("../models/Lamborginhi_Aventador_OBJ/Lamborghini_Aventador_chasis.obj");
 	modelLambo.setShader(&shaderMulLighting);
 	modelLamboLeftDor.loadModel("../models/Lamborginhi_Aventador_OBJ/Lamborghini_Aventador_left_dor.obj");
@@ -364,9 +376,12 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	// .loadModel("../models/mayow/personaje2.fbx");
 	// .setShader(&shaderMulLighting);
 
+	modelSpacesuit.loadModel("../models/spacesuit/spacesuit_confederation_of_planets.obj");
+	modelSpacesuit.setShader(&shaderMulLighting);
+	modelGunship.loadModel("../models/gunship/warhammer_40k_-_space_marine_stormtalon_gunship.obj");
+	modelGunship.setShader(&shaderMulLighting);
 
-
-	camera->setPosition(glm::vec3(0.0, 3.0, 4.0));
+	camera->setPosition(glm::vec3(0.0, 20.0, 30.0));
 	
 	// Carga de texturas para el skybox
 	Texture skyboxTexture = Texture("");
@@ -585,6 +600,9 @@ void destroy() {
 	modelBuzzLeftForeArm.destroy();
 	modelBuzzLeftHand.destroy();
 
+	modelSpacesuit.destroy();
+	modelGunship.destroy();
+
 	// Textures Delete
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDeleteTextures(1, &textureCespedID);
@@ -783,8 +801,7 @@ bool processInput(bool continueApplication) {
 void applicationLoop() {
 	bool psi = true;
 
-	modelMatrixEclipse = glm::translate(modelMatrixEclipse, glm::vec3(27.5, 0, 30.0));
-	modelMatrixEclipse = glm::rotate(modelMatrixEclipse, glm::radians(180.0f), glm::vec3(0, 1, 0));
+	// VARIABLES DE LA MÁQUINA DE ESTADOS
 	int state = 0;
 	float advanceCount = 0.0; // Infica cuánto hemos avanzado
 	float rotCount = 0.0;
@@ -794,6 +811,21 @@ void applicationLoop() {
 	int maxAdvance = 0.0;
 	const float avanceEclipse = 0.1; // Velocidad de avance
 	const float rotEclipse = 0.5; // Velocidad de giro
+
+	// Variables animación máquina de estados [LAMBO]
+	int flg_edo_lambo = 0;			// Indica el estado actual
+	float avzCont_lambo = 0.0;		// Indica cuánto hemos avanzado
+	float rotCont_lambo = 0.0;		// Indica cuánto gira el carro
+	float rotWheelsX_lambo = 0.0;	// ...
+	float rotWheelsY_lambo = 0.0;	// ...
+	int flg_caseAvz_lambo = 0; 		// Indica en qué punto del recorrido estamos
+	int maxAvz_lambo = 0.0;			// Distancia máxima por avanzar
+	const float avance_lambo = 0.1;	// Velocidad de avance
+	const float rad_rot_lambo = 0.5; 	// Velocidad de giro 0.5rad = 90º
+
+	// POSICIONES INICIALES DE LOS MODELOS
+	modelMatrixEclipse = glm::translate(modelMatrixEclipse, glm::vec3(27.5, 0, 30.0));
+	modelMatrixEclipse = glm::rotate(modelMatrixEclipse, glm::radians(180.0f), glm::vec3(0, 1, 0));
 
 	matrixModelRock = glm::translate(matrixModelRock, glm::vec3(-3.0, 0.0, 2.0));
 
@@ -806,6 +838,9 @@ void applicationLoop() {
 	modelMatrixDart = glm::translate(modelMatrixDart, glm::vec3(3.0, 0.0, 20.0));
 
 	modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(10.0f, 0.0, -30.0f));
+
+	modelMatrixSpacesuit = glm::translate(modelMatrixSpacesuit, glm::vec3(20.0f, 0.0, 20.0f));
+	modelMatrixGunship = glm::translate(modelMatrixGunship, glm::vec3(40.0f, 0.0, 20.0f));
 
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
@@ -1045,6 +1080,9 @@ void applicationLoop() {
 		// Lambo car
 		glDisable(GL_CULL_FACE);
 		glm::mat4 modelMatrixLamboChasis = glm::mat4(modelMatrixLambo);
+		modelMatrixLamboChasis = glm::translate(modelMatrixLamboChasis,glm::vec3(0.0,0.0,7.7));
+		modelMatrixLamboChasis = glm::rotate(modelMatrixLamboChasis, glm::radians(-90.0f), glm::vec3(0,1,0)); //NOTAS
+
 		modelMatrixLamboChasis = glm::scale(modelMatrixLamboChasis, glm::vec3(1.3, 1.3, 1.3));
 		modelLambo.render(modelMatrixLamboChasis);
 		glActiveTexture(GL_TEXTURE0);
@@ -1052,6 +1090,7 @@ void applicationLoop() {
 		modelMatrixLamboLeftDor = glm::translate(modelMatrixLamboLeftDor, glm::vec3(1.08866, 0.705743, 0.968917));
 		modelMatrixLamboLeftDor = glm::rotate(modelMatrixLamboLeftDor, glm::radians(dorRotCount), glm::vec3(1.0, 0, 0));
 		modelMatrixLamboLeftDor = glm::translate(modelMatrixLamboLeftDor, glm::vec3(-1.08866, -0.705743, -0.968917));
+
 		modelLamboLeftDor.render(modelMatrixLamboLeftDor);
 		modelLamboRightDor.render(modelMatrixLamboChasis);
 		modelLamboFrontLeftWheel.render(modelMatrixLamboChasis);
@@ -1143,6 +1182,13 @@ void applicationLoop() {
 		modelMatrixBuzzLeftHand = glm::rotate(
 			modelMatrixBuzzLeftHand, rotBuzzLeftHand, glm::vec3(1.0, 0.0, 0.0));
 		modelBuzzLeftHand.render(modelMatrixBuzzLeftHand);
+
+		glm::mat4 renderMatrixSpacesuit = glm::mat4(modelMatrixSpacesuit);
+		renderMatrixSpacesuit = glm::scale(renderMatrixSpacesuit, glm::vec3(1.0, 1.0, 1.0));
+		modelSpacesuit.render(renderMatrixSpacesuit);
+		glm::mat4 renderMatrixGunship = glm::mat4(modelMatrixGunship);
+		renderMatrixGunship = glm::scale(renderMatrixGunship, glm::vec3(0.5, 0.5, 0.5));
+		modelGunship.render(renderMatrixGunship);
 
 
 		/*******************************************
@@ -1247,7 +1293,7 @@ void applicationLoop() {
 		rotHelHelBack += 0.5;
 
 		//****************************************
-		// Máquinas de estados (helicóptero)
+		// Máquinas de estados (ECLIPSE)
 		//****************************************
 		switch (state)
 		{
@@ -1299,21 +1345,69 @@ void applicationLoop() {
 		//****************************************
 		// Máquinas de estados (lambo)
 		//****************************************
-		switch (stateDoor)
-		{
-		case 0:
-			dorRotCount++;
-			if(dorRotCount > 75.0f)
-				stateDoor = 1;
-			break;
-		case 1:
-			dorRotCount--;
-			if(dorRotCount < 0.0f)
-				stateDoor = 0;
-			break;
-		default:
-			break;
-		}
+
+		// switch (state)
+		// {
+		// case 0: // Determina cuánto avanzar
+		// 	if(flg_edo_lambo == 0)
+		// 		maxAvz_lambo = 65.0f;
+		// 	else if (flg_edo_lambo == 1)
+		// 		maxAvz_lambo = 49.0f;
+		// 	else if (flg_edo_lambo == 2)
+		// 		maxAvz_lambo = 44.5f;
+		// 	else if (flg_edo_lambo == 3)
+		// 		maxAvz_lambo = 49.0f;
+		// 	else if (flg_edo_lambo == 4)
+		// 		maxAvz_lambo = 44.5f;
+		// 	state = 1;
+		// 	break;
+		// case 1:
+		// 	modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(0.0, 0.0, avance_lambo));
+		// 	avzCont_lambo += avance_lambo;
+		// 	rotWheelsX_lambo += 0.025;// Rotación de las llantas
+		// 	rotWheelsY_lambo -= 0.0025;
+		// 	if(rotWheelsY_lambo < 0)
+		// 		rotWheelsY_lambo = 0.0;
+		// 	if(avzCont_lambo > maxAvz_lambo){
+		// 		avzCont_lambo = 0.0;
+		// 		flg_edo_lambo ++;
+		// 		state = 2;
+		// 		if(avzCont_lambo > 4)
+		// 			avzCont_lambo = 1;
+		// 	}
+		// 	break;
+		// case 2: // Rotación en las esquinas
+		// 	modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(0,0,0.025));
+		// 	modelMatrixLambo = glm::rotate(modelMatrixLambo, glm::radians(-rad_rot_lambo), glm::vec3(0.0f,1.0f,0.0f));
+		// 	rotCont_lambo += rad_rot_lambo;
+		// 	rotWheelsY_lambo += 0.0025;
+		// 	rotWheelsX_lambo += 0.025;
+		// 	if(rotWheelsY_lambo > 0.25)
+		// 		rotWheelsY_lambo = 0.25f;
+		// 	if(rotCont_lambo > 90.0){
+		// 		rotCont_lambo = 0;
+		// 		state = 0;
+		// 	}
+		// 	break;
+		// default:
+		// 	break;
+		// }
+
+		// switch (stateDoor)
+		// {
+		// case 0:
+		// 	dorRotCount++;
+		// 	if(dorRotCount > 75.0f)
+		// 		stateDoor = 1;
+		// 	break;
+		// case 1:
+		// 	dorRotCount--;
+		// 	if(dorRotCount < 0.0f)
+		// 		stateDoor = 0;
+		// 	break;
+		// default:
+		// 	break;
+		// }
 		glfwSwapBuffers(window);
 	}
 }
