@@ -1,13 +1,13 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
-// glew include
+//glew include
 #include <GL/glew.h>
 
-// std includes
+//std includes
 #include <string>
 #include <iostream>
 
-// glfw include
+//glfw include
 #include <GLFW/glfw3.h>
 
 // program include
@@ -22,7 +22,7 @@
 #include "Headers/Box.h"
 #include "Headers/FirstPersonCamera.h"
 
-// GLM include
+//GLM include
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -34,6 +34,11 @@
 #include "Headers/Model.h"
 
 #include "Headers/AnimationUtils.h"
+
+/* ****************************************************************
+	BIBLIOTECAS DE LOS ALUMNOS
+**************************************************************** */
+#include "Headers/XModelBuzz.h"
 
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a) / sizeof(a[0]))
 
@@ -93,13 +98,8 @@ Model modelCowboy;
 // Model cyborg
 Model modelCyborg;
 
-// Model Buzz
-Model modelBuzzHead;
-Model modelBuzzLeftArm;
-Model modelBuzzLeftForeArm;
-Model modelBuzzLeftHand;
-Model modelBuzzHip;
-Model modelBuzzTorso;
+// Model Buzz ...
+XModelBuzz xmodelBuzz;
 
 Model modelSpacesuit;
 Model modelGunship;
@@ -142,13 +142,11 @@ glm::mat4 modelMatrixHeli = glm::mat4(1.0f);
 glm::mat4 modelMatrixLambo = glm::mat4(1.0);
 glm::mat4 modelMatrixAircraft = glm::mat4(1.0);
 glm::mat4 modelMatrixDart = glm::mat4(1.0f);
-glm::mat4 modelMatrixBuzz = glm::mat4(1.0f);
 glm::mat4 modelMatrixSpacesuit = glm::mat4(1.0f);
 glm::mat4 modelMatrixGunship = glm::mat4(1.0f);
 
 // Variables de rotación de las artiulaciones
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
-float rotBuzzHead = 0.0, rotBuzzLeftArm = 0.0, rotBuzzLeftForeArm = 0.0, rotBuzzLeftHand = 0.0;
 int modelSelected = 0;
 bool enableCountSelected = true;
 
@@ -171,20 +169,6 @@ int indexFrameDartNext = 1;
 float interpolationDart = 0.0;
 int maxNumPasosDart = 200;
 int numPasosDart = 0;
-
-// Joints interpolations Buzz
-std::vector<std::vector<float>> keyFramesBuzzJoints;
-std::vector<std::vector<glm::mat4>> keyFramesBuzz;
-int indexFrameBuzzJoints = 0;
-int indexFrameBuzzJointsNext = 1;
-float interpolationBuzzJoints = 0.0;
-int maxNumPasosBuzzJoints = 20;
-int numPasosBuzzJoints = 0;
-int indexFrameBuzz = 0;
-int indexFrameBuzzNext = 1;
-float interpolationBuzz = 0.0;
-int maxNumPasosBuzz = 200;
-int numPasosBuzz = 0;
 
 // Variales de animación de la puerta [LAMBO]
 int stateDoor = 0;
@@ -352,19 +336,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	modelDartLegoRightLeg.loadModel("../models/LegoDart/LeoDart_right_leg.obj");
 	modelDartLegoRightLeg.setShader(&shaderMulLighting);
 
-	// Model Buzz
-	modelBuzzHead.loadModel("../models/buzz/buzzlightyHead.obj");
-	modelBuzzHead.setShader(&shaderMulLighting);
-	modelBuzzHip.loadModel("../models/buzz/buzzlightyHip.obj");
-	modelBuzzHip.setShader(&shaderMulLighting);
-	modelBuzzTorso.loadModel("../models/buzz/buzzlightyTorso.obj");
-	modelBuzzTorso.setShader(&shaderMulLighting);
-	modelBuzzLeftArm.loadModel("../models/buzz/buzzlightyLeftArm.obj");
-	modelBuzzLeftArm.setShader(&shaderMulLighting);
-	modelBuzzLeftForeArm.loadModel("../models/buzz/buzzlightyLeftForearm.obj");
-	modelBuzzLeftForeArm.setShader(&shaderMulLighting);
-	modelBuzzLeftHand.loadModel("../models/buzz/buzzlightyLeftHand.obj");
-	modelBuzzLeftHand.setShader(&shaderMulLighting);
+	xmodelBuzz.xLoadModel(shaderMulLighting);
 
 	// // Modelo de mayow
 	// modelMayow.loadModel("../models/mayow/personaje2.fbx");
@@ -599,18 +571,8 @@ void destroy()
 	modelLamboRearRightWheel.destroy();
 	modelLamboRightDor.destroy();
 	modelRock.destroy();
-	modelBuzzHead.destroy();
-	modelBuzzLeftArm.destroy();
-	modelBuzzLeftForeArm.destroy();
-	modelBuzzLeftHand.destroy();
-	modelBuzzTorso.destroy();
 
-	modelBuzzHead.destroy();
-	modelBuzzHip.destroy();
-	modelBuzzTorso.destroy();
-	modelBuzzLeftArm.destroy();
-	modelBuzzLeftForeArm.destroy();
-	modelBuzzLeftHand.destroy();
+	xmodelBuzz.xDestroyModel();
 
 	modelSpacesuit.destroy();
 	modelGunship.destroy();
@@ -735,9 +697,9 @@ bool processInput(bool continueApplication)
 		if (modelSelected == 2)
 			keyFramesDart = getKeyFrames(fileName);
 		if (modelSelected == 3)
-			keyFramesBuzzJoints = getKeyRotFrames(fileName);
+			xmodelBuzz.xSetKeyFramesJoints(getKeyRotFrames(fileName));
 		if (modelSelected == 4)
-			keyFramesBuzz = getKeyFrames(fileName);
+			xmodelBuzz.xSetKeyFrames(getKeyFrames(fileName));
 	}
 	if (availableSave && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
 	{
@@ -801,22 +763,11 @@ bool processInput(bool continueApplication)
 		modelMatrixDart = glm::translate(modelMatrixDart, glm::vec3(0.02, 0.0, 0.0));
 
 	// Buzz model movements
-	if (modelSelected == 3 && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE &&
-		glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		rotBuzzHead += 0.02;
-	else if (modelSelected == 3 && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS &&
-			 glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		rotBuzzHead -= 0.02;
-
+	if (modelSelected == 3)
+		xmodelBuzz.xMovementsArti(window);
 	// Rotación completa Buzz
-	if (modelSelected == 4 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		modelMatrixBuzz = glm::rotate(modelMatrixBuzz, 0.02f, glm::vec3(0, 1, 0));
-	else if (modelSelected == 4 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		modelMatrixBuzz = glm::rotate(modelMatrixBuzz, -0.02f, glm::vec3(0, 1, 0));
-	if (modelSelected == 4 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(0.0, 0.0, 0.02));
-	else if (modelSelected == 4 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(0.02, 0.0, 0.0));
+	if (modelSelected == 3)
+		xmodelBuzz.xMovementsFull(window);
 
 	glfwPollEvents();
 	return continueApplication;
@@ -850,13 +801,13 @@ void applicationLoop()
 	const float deg_veloRot_lambo = 0.5; // Velocidad de giro 0.5rad = 90º
 
 	// Variables de la animación por máquina de estados [HELICÓPTERO]
-	int flg_edo_helicop = 0;			   // Indica el estado actual
-	float avzCont_helicop = 0.0;		   // Indica cuánto hemos avanzado
-	float rotHelTop_helicop = 0.0;		   // ...
-	float rotHelBack_helicop = 0.0;		   // ...
-	float veloRotHel_helicop = 0.5;		   // Velocidad a la que rotan las hélices
-	int maxAvz_helicop = 0.0;			   // Distancia máxima por avanzar
-	const float veloAvz_helicop = 0.05;	   // Velocidad de avance
+	int flg_edo_helicop = 0;			// Indica el estado actual
+	float avzCont_helicop = 0.0;		// Indica cuánto hemos avanzado
+	float rotHelTop_helicop = 0.0;		// ...
+	float rotHelBack_helicop = 0.0;		// ...
+	float veloRotHel_helicop = 0.5;		// Velocidad a la que rotan las hélices
+	int maxAvz_helicop = 0.0;			// Distancia máxima por avanzar
+	const float veloAvz_helicop = 0.05; // Velocidad de avance
 
 	// Var animate helicopter
 
@@ -874,7 +825,7 @@ void applicationLoop()
 
 	modelMatrixDart = glm::translate(modelMatrixDart, glm::vec3(3.0, 0.0, 20.0));
 
-	modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(10.0f, 0.0, -30.0f));
+	xmodelBuzz.xSetModelMatrix(glm::vec3(10.0f, 0.0, -30.0f));
 
 	modelMatrixSpacesuit = glm::translate(modelMatrixSpacesuit, glm::vec3(20.0f, 0.0, 20.0f));
 	modelMatrixGunship = glm::translate(modelMatrixGunship, glm::vec3(40.0f, 0.0, 20.0f));
@@ -883,8 +834,8 @@ void applicationLoop()
 	fileName = "../animaciones/animation_dart_joints.txt";
 	keyFramesDartJoints = getKeyRotFrames(fileName);
 	keyFramesDart = getKeyFrames("../animaciones/animation_dart.txt");
-	keyFramesBuzzJoints = getKeyRotFrames("../animaciones/animation_buzz_joints.txt");
-	keyFramesBuzz = getKeyFrames("../animaciones/animation_buzz.txt");
+	xmodelBuzz.xSetKeyFramesJoints(getKeyRotFrames("../animaciones/animation_buzz_joints.txt"));
+	xmodelBuzz.xSetKeyFrames(getKeyFrames("../animaciones/animation_buzz.txt"));
 
 	lastTime = TimeManager::Instance().GetTime();
 
@@ -902,10 +853,8 @@ void applicationLoop()
 		psi = processInput(true);
 
 		// Variables donde se guardan las matrices de cada articulacion por 1 frame
-		std::vector<float> matrixDartJoints;
-		std::vector<glm::mat4> matrixDart;
-		std::vector<float> matrixBuzzJoints;
-		std::vector<glm::mat4> matrixBuzz;
+		std::vector<float> matrixSaveKFJ_dart;
+		std::vector<glm::mat4> matrixSaveKF_dart;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
@@ -1245,35 +1194,7 @@ void applicationLoop()
 		glEnable(GL_CULL_FACE);
 
 		// Renderizado de Buzz
-		glm::mat4 modelMatrixBuzzBody = glm::mat4(modelMatrixBuzz);
-		modelMatrixBuzzBody = glm::scale(modelMatrixBuzzBody, glm::vec3(3.f));
-		modelBuzzTorso.render(modelMatrixBuzzBody);
-
-		glm::mat4 modelMatrixBuzzHead = glm::mat4(modelMatrixBuzzBody);
-		modelMatrixBuzzHead = glm::rotate(modelMatrixBuzzHead, rotBuzzHead, glm::vec3(0, 1, 0));
-		modelBuzzHead.render(modelMatrixBuzzHead);
-
-		glm::mat4 modelMatrixBuzzHip = glm::mat4(modelMatrixBuzzBody);
-		modelBuzzHip.render(modelMatrixBuzzHip);
-
-		glm::mat4 modelMatrixBuzzLeftArm = glm::mat4(modelMatrixBuzzBody);
-		modelMatrixBuzzLeftArm = glm::translate(
-			modelMatrixBuzzLeftArm, glm::vec3(0.177885, 0.58335, -0.026702));
-		modelMatrixBuzzLeftArm = glm::rotate(
-			modelMatrixBuzzLeftArm, rotBuzzLeftArm, glm::vec3(1.0, 0.0, 0.0));
-		modelMatrixBuzzLeftArm = glm::translate(
-			modelMatrixBuzzLeftArm, glm::vec3(-0.177885, -0.58335, 0.026702));
-		modelBuzzLeftArm.render(modelMatrixBuzzLeftArm);
-
-		glm::mat4 modelMatrixBuzzLeftForeArm = glm::mat4(modelMatrixBuzzLeftArm);
-		modelMatrixBuzzLeftForeArm = glm::rotate(
-			modelMatrixBuzzLeftForeArm, rotBuzzLeftForeArm, glm::vec3(1.0, 0.0, 0.0));
-		modelBuzzLeftForeArm.render(modelMatrixBuzzLeftForeArm);
-
-		glm::mat4 modelMatrixBuzzLeftHand = glm::mat4(modelMatrixBuzzLeftForeArm);
-		modelMatrixBuzzLeftHand = glm::rotate(
-			modelMatrixBuzzLeftHand, rotBuzzLeftHand, glm::vec3(1.0, 0.0, 0.0));
-		modelBuzzLeftHand.render(modelMatrixBuzzLeftHand);
+		xmodelBuzz.xRenderModel();
 
 		glm::mat4 renderMatrixSpacesuit = glm::mat4(modelMatrixSpacesuit);
 		renderMatrixSpacesuit = glm::scale(renderMatrixSpacesuit, glm::vec3(1.0, 1.0, 1.0));
@@ -1301,17 +1222,17 @@ void applicationLoop()
 		// Para salvar los keyframes
 		if (modelSelected == 1 && record)
 		{
-			matrixDartJoints.push_back(rotDartHead);
-			matrixDartJoints.push_back(rotDartLeftArm);
-			matrixDartJoints.push_back(rotDartLeftHand);
-			matrixDartJoints.push_back(rotDartRightArm);
-			matrixDartJoints.push_back(rotDartRightHand);
-			matrixDartJoints.push_back(rotDartLeftLeg);
-			matrixDartJoints.push_back(rotDartRightLeg);
+			matrixSaveKFJ_dart.push_back(rotDartHead);
+			matrixSaveKFJ_dart.push_back(rotDartLeftArm);
+			matrixSaveKFJ_dart.push_back(rotDartLeftHand);
+			matrixSaveKFJ_dart.push_back(rotDartRightArm);
+			matrixSaveKFJ_dart.push_back(rotDartRightHand);
+			matrixSaveKFJ_dart.push_back(rotDartLeftLeg);
+			matrixSaveKFJ_dart.push_back(rotDartRightLeg);
 
 			if (saveFrame)
 			{
-				appendFrame(myfile, matrixDartJoints);
+				appendFrame(myfile, matrixSaveKFJ_dart);
 				saveFrame = false;
 			}
 		}
@@ -1330,42 +1251,42 @@ void applicationLoop()
 				indexFrameDartJointsNext = 0;
 			rotDartHead = interpolate(
 				keyFramesDartJoints, indexFrameDartJoints, indexFrameDartJointsNext,
-				0, interpolationDartJoints // 0 es por el orden en que hicimos matrixDartJoints.push_back()
+				0, interpolationDartJoints // 0 es por el orden en que hicimos matrixSaveKFJ_dart.push_back()
 			);
 			rotDartLeftArm = interpolate(
 				keyFramesDartJoints, indexFrameDartJoints, indexFrameDartJointsNext,
-				1, interpolationDartJoints // 0 es por el orden en que hicimos matrixDartJoints.push_back()
+				1, interpolationDartJoints // 0 es por el orden en que hicimos matrixSaveKFJ_dart.push_back()
 			);
 			rotDartLeftHand = interpolate(
 				keyFramesDartJoints, indexFrameDartJoints, indexFrameDartJointsNext,
-				2, interpolationDartJoints // 0 es por el orden en que hicimos matrixDartJoints.push_back()
+				2, interpolationDartJoints // 0 es por el orden en que hicimos matrixSaveKFJ_dart.push_back()
 			);
 			rotDartRightArm = interpolate(
 				keyFramesDartJoints, indexFrameDartJoints, indexFrameDartJointsNext,
-				3, interpolationDartJoints // 0 es por el orden en que hicimos matrixDartJoints.push_back()
+				3, interpolationDartJoints // 0 es por el orden en que hicimos matrixSaveKFJ_dart.push_back()
 			);
 			rotDartRightHand = interpolate(
 				keyFramesDartJoints, indexFrameDartJoints, indexFrameDartJointsNext,
-				4, interpolationDartJoints // 0 es por el orden en que hicimos matrixDartJoints.push_back()
+				4, interpolationDartJoints // 0 es por el orden en que hicimos matrixSaveKFJ_dart.push_back()
 			);
 			rotDartLeftLeg = interpolate(
 				keyFramesDartJoints, indexFrameDartJoints, indexFrameDartJointsNext,
-				5, interpolationDartJoints // 0 es por el orden en que hicimos matrixDartJoints.push_back()
+				5, interpolationDartJoints // 0 es por el orden en que hicimos matrixSaveKFJ_dart.push_back()
 			);
 			rotDartRightLeg = interpolate(
 				keyFramesDartJoints, indexFrameDartJoints, indexFrameDartJointsNext,
-				6, interpolationDartJoints // 0 es por el orden en que hicimos matrixDartJoints.push_back()
+				6, interpolationDartJoints // 0 es por el orden en que hicimos matrixSaveKFJ_dart.push_back()
 			);
 		}
 
 		// Dart completo
 		if (modelSelected == 2 && record)
 		{
-			matrixDart.push_back(modelMatrixDart);
+			matrixSaveKF_dart.push_back(modelMatrixDart);
 			if (saveFrame)
 			{
 				saveFrame = false;
-				appendFrame(myfile, matrixDart);
+				appendFrame(myfile, matrixSaveKF_dart);
 			}
 		}
 		else if (keyFramesDart.size() > 0)
@@ -1538,7 +1459,7 @@ void applicationLoop()
 			modelMatrixHeli = glm::translate(
 				modelMatrixHeli, glm::vec3(0.0, 0.0, veloAvz_helicop));
 			avzCont_helicop += veloAvz_helicop;
-			
+
 			// Al llegar a la plataforma, descendemos
 			if (avzCont_helicop >= maxAvz_helicop)
 			{
@@ -1559,7 +1480,7 @@ void applicationLoop()
 			}
 			break;
 		case 3: // Detener las hélices de a poco
-			if(veloRotHel_helicop > 0)
+			if (veloRotHel_helicop > 0)
 				veloRotHel_helicop -= 0.001;
 			else
 				veloRotHel_helicop = 0.0;
@@ -1574,6 +1495,8 @@ void applicationLoop()
 
 int main(int argc, char **argv)
 {
+	// xmodelBuzz = XModelBuzz();
+	
 	init(800, 700, "Window GLFW", false);
 	applicationLoop();
 	destroy();

@@ -60,6 +60,9 @@
     <ClCompile Include="src\FontTypeRendering.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="src\XModelBuzz.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Headers\AbstractModel.h">
@@ -120,6 +123,9 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="include\Headers\FontTypeRendering.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Headers\XModelBuzz.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
