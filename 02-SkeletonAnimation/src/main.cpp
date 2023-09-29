@@ -92,6 +92,8 @@ Model modelBob;
 Model modelCowboy;
 //Model cyborg
 Model modelCyborg;
+//model lily
+Model modelLily;
 
 // Model Buzz
 Model modelBuzzHead;
@@ -140,6 +142,7 @@ glm::mat4 modelMatrixLambo = glm::mat4(1.0);
 glm::mat4 modelMatrixAircraft = glm::mat4(1.0);
 glm::mat4 modelMatrixDart = glm::mat4(1.0f);
 glm::mat4 modelMatrixBuzz = glm::mat4(1.0f);
+glm::mat4 modelMatrixLily = glm::mat4(1.0f);
 
 // Variables de rotación de las artiulaciones
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
@@ -364,6 +367,9 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	// .loadModel("../models/mayow/personaje2.fbx");
 	// .setShader(&shaderMulLighting);
 
+	//lily
+	modelLily.loadModel("../models/Lily/ArturiaLily.obj");
+	modelLily.setShader(&shaderMulLighting);
 
 
 	camera->setPosition(glm::vec3(0.0, 3.0, 4.0));
@@ -1145,6 +1151,10 @@ void applicationLoop() {
 		modelBuzzLeftHand.render(modelMatrixBuzzLeftHand);
 
 
+		glm::mat4 modelMatrixLily = glm::mat4(modelMatrixLily);
+		modelMatrixLily = glm::scale(modelMatrixLily,glm::vec3 (10.0f, 10.0f, 10.0f));
+		modelLily.render(modelMatrixLily);
+		modelLily.setAnimationIndex(1);
 		/*******************************************
 		 * Skybox
 		 *******************************************/
