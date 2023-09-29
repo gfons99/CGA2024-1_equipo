@@ -368,7 +368,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	// .setShader(&shaderMulLighting);
 
 	//lily
-	modelLily.loadModel("../models/Lily/ArturiaLily.obj");
+	modelLily.loadModel("../models/Lily/ArturiaLily.fbx");
 	modelLily.setShader(&shaderMulLighting);
 
 
@@ -1154,7 +1154,7 @@ void applicationLoop() {
 		glm::mat4 modelMatrixLily = glm::mat4(modelMatrixLily);
 		modelMatrixLily = glm::scale(modelMatrixLily,glm::vec3 (10.0f, 10.0f, 10.0f));
 		modelLily.render(modelMatrixLily);
-		modelLily.setAnimationIndex(1);
+		
 		/*******************************************
 		 * Skybox
 		 *******************************************/
