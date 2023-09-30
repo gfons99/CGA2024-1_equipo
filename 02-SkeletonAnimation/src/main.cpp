@@ -195,6 +195,9 @@ float dorRotCount = 0.0;
 double deltaTime;
 double currTime, lastTime;
 
+// Variables de animación [Lily]
+int numAni_Lily = 0;
+
 // Variables animacion maquina de estados eclipse
 const float avance = 0.1;
 const float giroEclipse = 0.5f;
@@ -669,7 +672,7 @@ bool processInput(bool continueApplication) {
 	if (enableCountSelected && glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS){
 		enableCountSelected = false;
 		modelSelected++;
-		if(modelSelected > 4)
+		if(modelSelected > 5)
 			modelSelected = 0;
 		if(modelSelected == 1)
 			fileName = "../animaciones/animation_dart_joints.txt";
@@ -782,6 +785,33 @@ bool processInput(bool continueApplication) {
 	else if (modelSelected == 4 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(0.02, 0.0, 0.0));
 
+	// Movimientos de [Lily]
+	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		modelMatrixLily = glm::rotate(modelMatrixLily, 0.02f, glm::vec3(0, 1, 0));
+		numAni_Lily = 0;
+	}
+	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		modelMatrixLily = glm::rotate(modelMatrixLily, -0.02f, glm::vec3(0, 1, 0));
+		numAni_Lily = 0;
+	}
+	else
+		numAni_Lily = 1;
+
+	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.0, 0.0, 0.02));
+		numAni_Lily = 0;
+	}
+	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.02, 0.0, 0.0));
+		numAni_Lily = 0;
+	}
+	else
+		numAni_Lily = 1;
+
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -813,6 +843,8 @@ void applicationLoop() {
 	modelMatrixDart = glm::translate(modelMatrixDart, glm::vec3(3.0, 0.0, 20.0));
 
 	modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(10.0f, 0.0, -30.0f));
+
+	modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(20.0f, 0.0, -30.0f));
 
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
@@ -1121,41 +1153,42 @@ void applicationLoop() {
 		glEnable(GL_CULL_FACE);
 
 		// Renderizado de Buzz
-		// glm::mat4 modelMatrixBuzzBody =  glm::mat4(modelMatrixBuzz);
-		// modelMatrixBuzzBody = glm::scale(modelMatrixBuzzBody, glm::vec3(3.f));
-		// modelBuzzTorso.render(modelMatrixBuzzBody);
+		glm::mat4 modelMatrixBuzzBody =  glm::mat4(modelMatrixBuzz);
+		modelMatrixBuzzBody = glm::scale(modelMatrixBuzzBody, glm::vec3(3.f));
+		modelBuzzTorso.render(modelMatrixBuzzBody);
 		
-		// glm::mat4 modelMatrixBuzzHead =  glm::mat4(modelMatrixBuzzBody);
-		// modelMatrixBuzzHead =  glm::rotate(modelMatrixBuzzHead, rotBuzzHead, glm::vec3(0,1,0));
-		// modelBuzzHead.render(modelMatrixBuzzHead);
+		glm::mat4 modelMatrixBuzzHead =  glm::mat4(modelMatrixBuzzBody);
+		modelMatrixBuzzHead =  glm::rotate(modelMatrixBuzzHead, rotBuzzHead, glm::vec3(0,1,0));
+		modelBuzzHead.render(modelMatrixBuzzHead);
 
-		// glm::mat4 modelMatrixBuzzHip = glm::mat4(modelMatrixBuzzBody);
-		// modelBuzzHip.render(modelMatrixBuzzHip);
+		glm::mat4 modelMatrixBuzzHip = glm::mat4(modelMatrixBuzzBody);
+		modelBuzzHip.render(modelMatrixBuzzHip);
 
-		// glm::mat4 modelMatrixBuzzLeftArm = glm::mat4(modelMatrixBuzzBody);
-		// modelMatrixBuzzLeftArm = glm::translate(
-		// 	modelMatrixBuzzLeftArm, glm::vec3(0.177885,0.58335,-0.026702));
-		// modelMatrixBuzzLeftArm = glm::rotate(
-		// 	modelMatrixBuzzLeftArm, rotBuzzLeftArm, glm::vec3(1.0, 0.0, 0.0));
-		// modelMatrixBuzzLeftArm = glm::translate(
-		// 	modelMatrixBuzzLeftArm, glm::vec3(-0.177885,-0.58335,0.026702));
-		// modelBuzzLeftArm.render(modelMatrixBuzzLeftArm);
+		glm::mat4 modelMatrixBuzzLeftArm = glm::mat4(modelMatrixBuzzBody);
+		modelMatrixBuzzLeftArm = glm::translate(
+			modelMatrixBuzzLeftArm, glm::vec3(0.177885,0.58335,-0.026702));
+		modelMatrixBuzzLeftArm = glm::rotate(
+			modelMatrixBuzzLeftArm, rotBuzzLeftArm, glm::vec3(1.0, 0.0, 0.0));
+		modelMatrixBuzzLeftArm = glm::translate(
+			modelMatrixBuzzLeftArm, glm::vec3(-0.177885,-0.58335,0.026702));
+		modelBuzzLeftArm.render(modelMatrixBuzzLeftArm);
 
-		// glm::mat4 modelMatrixBuzzLeftForeArm = glm::mat4(modelMatrixBuzzLeftArm);
-		// modelMatrixBuzzLeftForeArm = glm::rotate(
-		// 	modelMatrixBuzzLeftForeArm, rotBuzzLeftForeArm, glm::vec3(1.0, 0.0, 0.0));
-		// modelBuzzLeftForeArm.render(modelMatrixBuzzLeftForeArm);
+		glm::mat4 modelMatrixBuzzLeftForeArm = glm::mat4(modelMatrixBuzzLeftArm);
+		modelMatrixBuzzLeftForeArm = glm::rotate(
+			modelMatrixBuzzLeftForeArm, rotBuzzLeftForeArm, glm::vec3(1.0, 0.0, 0.0));
+		modelBuzzLeftForeArm.render(modelMatrixBuzzLeftForeArm);
 
-		// glm::mat4 modelMatrixBuzzLeftHand = glm::mat4(modelMatrixBuzzLeftForeArm);
-		// modelMatrixBuzzLeftHand = glm::rotate(
-		// 	modelMatrixBuzzLeftHand, rotBuzzLeftHand, glm::vec3(1.0, 0.0, 0.0));
-		// modelBuzzLeftHand.render(modelMatrixBuzzLeftHand);
+		glm::mat4 modelMatrixBuzzLeftHand = glm::mat4(modelMatrixBuzzLeftForeArm);
+		modelMatrixBuzzLeftHand = glm::rotate(
+			modelMatrixBuzzLeftHand, rotBuzzLeftHand, glm::vec3(1.0, 0.0, 0.0));
+		modelBuzzLeftHand.render(modelMatrixBuzzLeftHand);
 
-
-		glm::mat4 modelMatrixLily = glm::mat4(modelMatrixBuzz);
-		modelMatrixLily = glm::scale(modelMatrixLily,glm::vec3 (0.02f, 0.02f, 0.02f));
-		modelLily.setAnimationIndex(1);
-		modelLily.render(modelMatrixLily);
+		// [Lily]
+		glm::mat4 renderMatrixLily = glm::mat4(modelMatrixLily);
+		renderMatrixLily = glm::scale(renderMatrixLily,glm::vec3 (0.02f, 0.02f, 0.02f));
+		
+		modelLily.setAnimationIndex(numAni_Lily);
+		modelLily.render(renderMatrixLily);
 		
 		/*******************************************
 		 * Skybox
