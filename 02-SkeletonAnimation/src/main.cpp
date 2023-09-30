@@ -783,7 +783,7 @@ bool processInput(bool continueApplication) {
 	if (modelSelected == 4 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(0.0, 0.0, 0.02));
 	else if (modelSelected == 4 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(0.02, 0.0, 0.0));
+		modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(0.0, 0.0, -0.02));
 
 	// Movimientos de [Lily]
 	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -806,7 +806,7 @@ bool processInput(bool continueApplication) {
 	}
 	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.02, 0.0, 0.0));
+		modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.0, 0.0, -0.02));
 		numAni_Lily = 0;
 	}
 	else
