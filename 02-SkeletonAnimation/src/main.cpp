@@ -590,6 +590,7 @@ void destroy() {
 	modelBuzzLeftArm.destroy();
 	modelBuzzLeftForeArm.destroy();
 	modelBuzzLeftHand.destroy();
+	modelLily.destroy();
 
 	// Textures Delete
 	glBindTexture(GL_TEXTURE_2D, 0);
