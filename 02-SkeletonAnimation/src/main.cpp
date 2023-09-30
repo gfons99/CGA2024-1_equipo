@@ -1121,39 +1121,40 @@ void applicationLoop() {
 		glEnable(GL_CULL_FACE);
 
 		// Renderizado de Buzz
-		glm::mat4 modelMatrixBuzzBody =  glm::mat4(modelMatrixBuzz);
-		modelMatrixBuzzBody = glm::scale(modelMatrixBuzzBody, glm::vec3(3.f));
-		modelBuzzTorso.render(modelMatrixBuzzBody);
+		// glm::mat4 modelMatrixBuzzBody =  glm::mat4(modelMatrixBuzz);
+		// modelMatrixBuzzBody = glm::scale(modelMatrixBuzzBody, glm::vec3(3.f));
+		// modelBuzzTorso.render(modelMatrixBuzzBody);
 		
-		glm::mat4 modelMatrixBuzzHead =  glm::mat4(modelMatrixBuzzBody);
-		modelMatrixBuzzHead =  glm::rotate(modelMatrixBuzzHead, rotBuzzHead, glm::vec3(0,1,0));
-		modelBuzzHead.render(modelMatrixBuzzHead);
+		// glm::mat4 modelMatrixBuzzHead =  glm::mat4(modelMatrixBuzzBody);
+		// modelMatrixBuzzHead =  glm::rotate(modelMatrixBuzzHead, rotBuzzHead, glm::vec3(0,1,0));
+		// modelBuzzHead.render(modelMatrixBuzzHead);
 
-		glm::mat4 modelMatrixBuzzHip = glm::mat4(modelMatrixBuzzBody);
-		modelBuzzHip.render(modelMatrixBuzzHip);
+		// glm::mat4 modelMatrixBuzzHip = glm::mat4(modelMatrixBuzzBody);
+		// modelBuzzHip.render(modelMatrixBuzzHip);
 
-		glm::mat4 modelMatrixBuzzLeftArm = glm::mat4(modelMatrixBuzzBody);
-		modelMatrixBuzzLeftArm = glm::translate(
-			modelMatrixBuzzLeftArm, glm::vec3(0.177885,0.58335,-0.026702));
-		modelMatrixBuzzLeftArm = glm::rotate(
-			modelMatrixBuzzLeftArm, rotBuzzLeftArm, glm::vec3(1.0, 0.0, 0.0));
-		modelMatrixBuzzLeftArm = glm::translate(
-			modelMatrixBuzzLeftArm, glm::vec3(-0.177885,-0.58335,0.026702));
-		modelBuzzLeftArm.render(modelMatrixBuzzLeftArm);
+		// glm::mat4 modelMatrixBuzzLeftArm = glm::mat4(modelMatrixBuzzBody);
+		// modelMatrixBuzzLeftArm = glm::translate(
+		// 	modelMatrixBuzzLeftArm, glm::vec3(0.177885,0.58335,-0.026702));
+		// modelMatrixBuzzLeftArm = glm::rotate(
+		// 	modelMatrixBuzzLeftArm, rotBuzzLeftArm, glm::vec3(1.0, 0.0, 0.0));
+		// modelMatrixBuzzLeftArm = glm::translate(
+		// 	modelMatrixBuzzLeftArm, glm::vec3(-0.177885,-0.58335,0.026702));
+		// modelBuzzLeftArm.render(modelMatrixBuzzLeftArm);
 
-		glm::mat4 modelMatrixBuzzLeftForeArm = glm::mat4(modelMatrixBuzzLeftArm);
-		modelMatrixBuzzLeftForeArm = glm::rotate(
-			modelMatrixBuzzLeftForeArm, rotBuzzLeftForeArm, glm::vec3(1.0, 0.0, 0.0));
-		modelBuzzLeftForeArm.render(modelMatrixBuzzLeftForeArm);
+		// glm::mat4 modelMatrixBuzzLeftForeArm = glm::mat4(modelMatrixBuzzLeftArm);
+		// modelMatrixBuzzLeftForeArm = glm::rotate(
+		// 	modelMatrixBuzzLeftForeArm, rotBuzzLeftForeArm, glm::vec3(1.0, 0.0, 0.0));
+		// modelBuzzLeftForeArm.render(modelMatrixBuzzLeftForeArm);
 
-		glm::mat4 modelMatrixBuzzLeftHand = glm::mat4(modelMatrixBuzzLeftForeArm);
-		modelMatrixBuzzLeftHand = glm::rotate(
-			modelMatrixBuzzLeftHand, rotBuzzLeftHand, glm::vec3(1.0, 0.0, 0.0));
-		modelBuzzLeftHand.render(modelMatrixBuzzLeftHand);
+		// glm::mat4 modelMatrixBuzzLeftHand = glm::mat4(modelMatrixBuzzLeftForeArm);
+		// modelMatrixBuzzLeftHand = glm::rotate(
+		// 	modelMatrixBuzzLeftHand, rotBuzzLeftHand, glm::vec3(1.0, 0.0, 0.0));
+		// modelBuzzLeftHand.render(modelMatrixBuzzLeftHand);
 
 
-		glm::mat4 modelMatrixLily = glm::mat4(modelMatrixLily);
-		modelMatrixLily = glm::scale(modelMatrixLily,glm::vec3 (10.0f, 10.0f, 10.0f));
+		glm::mat4 modelMatrixLily = glm::mat4(modelMatrixBuzz);
+		modelMatrixLily = glm::scale(modelMatrixLily,glm::vec3 (0.02f, 0.02f, 0.02f));
+		modelLily.setAnimationIndex(1);
 		modelLily.render(modelMatrixLily);
 		
 		/*******************************************
