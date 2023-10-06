@@ -911,8 +911,8 @@ void applicationLoop()
 
 	modelMatrixAircraft = glm::translate(modelMatrixAircraft, glm::vec3(10.0, 2.0, -17.5));
 
-	modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(23.0, 0.0, 0.0));
-
+	modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(20.0f, 0.0, -27.0f));
+	
 	modelMatrixDart = glm::translate(modelMatrixDart, glm::vec3(3.0, 0.0, 20.0));
 
 	modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(15.0, 0.0, -10.0));
@@ -1067,6 +1067,20 @@ void applicationLoop()
 		// Lambo car
 		glDisable(GL_CULL_FACE);
 		glm::mat4 modelMatrixLamboChasis = glm::mat4(modelMatrixLambo);
+		modelMatrixLamboChasis[3][1] = terrain.getHeightTerrain(modelMatrixLamboChasis[3][0], modelMatrixLamboChasis[3][2]);
+		//nomales
+		 glm::vec3 ejey_LamboChasis = glm::normalize(
+            terrain.getNormalTerrain(
+			modelMatrixLamboChasis[3][0], modelMatrixLamboChasis[3][2]));
+
+        glm::vec3 ejez_LamboChasis = glm::normalize(modelMatrixLamboChasis[2]);
+        glm::vec3 ejex_LamboChasis = glm::normalize(glm::cross(ejey_LamboChasis, ejez_LamboChasis));
+        ejez_LamboChasis = glm::normalize(glm::cross(ejex_LamboChasis,ejey_LamboChasis));
+
+        modelMatrixLamboChasis[0] = glm::vec4(ejex_LamboChasis, 0.0);
+        modelMatrixLamboChasis[1] = glm::vec4(ejey_LamboChasis, 0.0);
+        modelMatrixLamboChasis[2] = glm::vec4(ejez_LamboChasis, 0.0);
+
 		modelMatrixLamboChasis = glm::scale(modelMatrixLamboChasis, glm::vec3(1.3, 1.3, 1.3));
 		modelLambo.render(modelMatrixLamboChasis);
 		glActiveTexture(GL_TEXTURE0);
@@ -1076,9 +1090,85 @@ void applicationLoop()
 		modelMatrixLamboLeftDor = glm::translate(modelMatrixLamboLeftDor, glm::vec3(-1.08866, -0.705743, -0.968917));
 		modelLamboLeftDor.render(modelMatrixLamboLeftDor);
 		modelLamboRightDor.render(modelMatrixLamboChasis);
+
+		//render llanta izq frontal
+		glm::mat4 modelMatrixLamboFrontLeftWheel = glm::mat4(modelMatrixLamboChasis);
+		//mover sobre el plano 
+        modelMatrixLamboFrontLeftWheel[3][1] = terrain.getHeightTerrain(
+            modelMatrixLamboFrontLeftWheel[3][0], modelMatrixLamboFrontLeftWheel[3][2]);
+        // Para que se incline respecto a la normal
+        glm::vec3 ejey_LamboFrontLeftWheel = glm::normalize(
+            terrain.getNormalTerrain(
+			modelMatrixLamboFrontLeftWheel[3][0], modelMatrixLamboFrontLeftWheel[3][2]));
+
+        glm::vec3 ejez_LamboFrontLeftWheel = glm::normalize(modelMatrixLamboFrontLeftWheel[2]);
+        glm::vec3 ejex_LamboFrontLeftWheel = glm::normalize(glm::cross(ejey_LamboFrontLeftWheel, ejez_LamboFrontLeftWheel));
+        ejez_LamboFrontLeftWheel = glm::normalize(glm::cross(ejex_LamboFrontLeftWheel,ejey_LamboFrontLeftWheel));
+
+        modelMatrixLamboFrontLeftWheel[0] = glm::vec4(ejex_LamboFrontLeftWheel, 0.0);
+        modelMatrixLamboFrontLeftWheel[1] = glm::vec4(ejey_LamboFrontLeftWheel, 0.0);
+        modelMatrixLamboFrontLeftWheel[2] = glm::vec4(ejez_LamboFrontLeftWheel, 0.0);
+		
 		modelLamboFrontLeftWheel.render(modelMatrixLamboChasis);
+
+		//render llanta der frontal
+		glm::mat4 modelMatrixLamboFrontRightWheel = glm::mat4(modelMatrixLamboChasis);
+		//mover sobre el plano 
+        modelMatrixLamboFrontRightWheel[3][1] = terrain.getHeightTerrain(
+            modelMatrixLamboFrontRightWheel[3][0], modelMatrixLamboFrontRightWheel[3][2]);
+        // Para que se incline respecto a la normal
+        glm::vec3 ejey_LamboFrontRightWheel = glm::normalize(
+            terrain.getNormalTerrain(
+			modelMatrixLamboFrontRightWheel[3][0], modelMatrixLamboFrontRightWheel[3][2]));
+
+        glm::vec3 ejez_LamboFrontRightWheel = glm::normalize(modelMatrixLamboFrontRightWheel[2]);
+        glm::vec3 ejex_LamboFrontRightWheel = glm::normalize(glm::cross(ejey_LamboFrontRightWheel, ejez_LamboFrontRightWheel));
+        ejez_LamboFrontRightWheel = glm::normalize(glm::cross(ejex_LamboFrontRightWheel,ejey_LamboFrontRightWheel));
+
+        modelMatrixLamboFrontRightWheel[0] = glm::vec4(ejex_LamboFrontRightWheel, 0.0);
+        modelMatrixLamboFrontRightWheel[1] = glm::vec4(ejey_LamboFrontRightWheel, 0.0);
+        modelMatrixLamboFrontRightWheel[2] = glm::vec4(ejez_LamboFrontRightWheel, 0.0);
+
 		modelLamboFrontRightWheel.render(modelMatrixLamboChasis);
+
+		//render llanta izq tracera
+		glm::mat4 modelMatrixLamboRearLeftWheel = glm::mat4(modelMatrixLamboChasis);
+		//mover sobre el plano 
+        modelMatrixLamboRearLeftWheel[3][1] = terrain.getHeightTerrain(
+           modelMatrixLamboRearLeftWheel[3][0], modelMatrixLamboRearLeftWheel[3][2]);
+        // Para que se incline respecto a la normal
+        glm::vec3 ejey_LamboRearLeftWheel = glm::normalize(
+            terrain.getNormalTerrain(
+			modelMatrixLamboRearLeftWheel[3][0], modelMatrixLamboRearLeftWheel[3][2]));
+
+        glm::vec3 ejez_LamboRearLeftWheel = glm::normalize(modelMatrixLamboRearLeftWheel[2]);
+        glm::vec3 ejex_LamboRearLeftWheel = glm::normalize(glm::cross(ejey_LamboRearLeftWheel, ejez_LamboRearLeftWheel));
+        ejez_LamboRearLeftWheel = glm::normalize(glm::cross(ejex_LamboRearLeftWheel,ejey_LamboRearLeftWheel));
+
+        modelMatrixLamboRearLeftWheel[0] = glm::vec4(ejex_LamboRearLeftWheel, 0.0);
+        modelMatrixLamboRearLeftWheel[1] = glm::vec4(ejey_LamboRearLeftWheel, 0.0);
+        modelMatrixLamboRearLeftWheel[2] = glm::vec4(ejez_LamboRearLeftWheel, 0.0);
+
 		modelLamboRearLeftWheel.render(modelMatrixLamboChasis);
+
+		//render llanta der tracera
+		glm::mat4 modelMatrixLamboRearRightWheel = glm::mat4(modelMatrixLamboChasis);
+		//mover sobre el plano 
+        modelMatrixLamboRearRightWheel[3][1] = terrain.getHeightTerrain(
+           modelMatrixLamboRearRightWheel[3][0], modelMatrixLamboRearRightWheel[3][2]);
+        // Para que se incline respecto a la normal
+        glm::vec3 ejey_LamboRearRightWheel = glm::normalize(
+            terrain.getNormalTerrain(
+			modelMatrixLamboRearRightWheel[3][0], modelMatrixLamboRearRightWheel[3][2]));
+
+        glm::vec3 ejez_LamboRearRightWheel = glm::normalize(modelMatrixLamboRearRightWheel[2]);
+        glm::vec3 ejex_LamboRearRightWheel = glm::normalize(glm::cross(ejey_LamboRearRightWheel, ejez_LamboRearRightWheel));
+        ejez_LamboRearRightWheel = glm::normalize(glm::cross(ejex_LamboRearRightWheel,ejey_LamboRearRightWheel));
+
+        modelMatrixLamboRearRightWheel[0] = glm::vec4(ejex_LamboRearRightWheel, 0.0);
+        modelMatrixLamboRearRightWheel[1] = glm::vec4(ejey_LamboRearRightWheel, 0.0);
+        modelMatrixLamboRearRightWheel[2] = glm::vec4(ejez_LamboRearRightWheel, 0.0);
+
 		modelLamboRearRightWheel.render(modelMatrixLamboChasis);
 		// Se regresa el cull faces IMPORTANTE para las puertas
 		glEnable(GL_CULL_FACE);
