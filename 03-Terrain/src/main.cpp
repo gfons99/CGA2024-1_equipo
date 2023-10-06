@@ -104,9 +104,13 @@ Model cyborgModelAnimate;
 // model lily
 Model modelLily;
 
-// terreno (posición X, posición Z, tamaño en OpenGL, ponderación de la altura máxima, archivo del mapa de alturas)
+// terreno (posición X, posición Z,
+//				tamaño en OpenGL, ponderación de la altura máxima,
+//					archivo del mapa de alturas)
+
 // Terrain terrain(-1, -1, 200, 64, "../Textures/heightmap.png");
-Terrain terrain(-1, -1, 200, 64, "../Textures/terrain_20241.png");
+// Terrain terrain(-1, -1, 200, 64, "../Textures/terrain_20241.png");
+Terrain terrain(-0.7, -1.0, 200, 32, "../Textures/heightmap_cerroestrella.png");
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;
@@ -704,7 +708,7 @@ bool processInput(bool continueApplication)
 	{
 		enableCountSelected = false;
 		modelSelected++;
-		if (modelSelected > 4)
+		if (modelSelected > 5)
 			modelSelected = 0;
 		if (modelSelected == 1)
 			fileName = "../animaciones/animation_dart_joints.txt";
@@ -1203,6 +1207,20 @@ void applicationLoop()
 		// else flechas then render "reposo"
 
 		// [Lily]
+		// Para que camine sobre el plano
+		modelMatrixLily[3][1] = terrain.getHeightTerrain(
+			modelMatrixLily[3][0], modelMatrixLily[3][2]);
+		// Para que se incline respecto a la normal
+		glm::vec3 ejey_lily = glm::normalize(
+			terrain.getNormalTerrain(
+				modelMatrixLily[3][0], modelMatrixLily[3][2]));
+		glm::vec3 ejez_lily = glm::normalize(modelMatrixLily[2]);
+		glm::vec3 ejex_lily = glm::normalize(glm::cross(ejey_lily, ejez_lily));
+		ejez_lily = glm::normalize(glm::cross(ejex_lily,ejey_lily));
+		modelMatrixLily[0] = glm::vec4(ejex_lily, 0.0);
+		modelMatrixLily[1] = glm::vec4(ejey_lily, 0.0);
+		modelMatrixLily[2] = glm::vec4(ejez_lily, 0.0);		
+
 		glm::mat4 renderMatrixLily = glm::mat4(modelMatrixLily);
 		renderMatrixLily = glm::scale(renderMatrixLily, glm::vec3(0.02f, 0.02f, 0.02f));
 
