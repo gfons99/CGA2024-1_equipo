@@ -954,8 +954,8 @@ void applicationLoop()
 	modelMatrixAircraft = glm::translate(modelMatrixAircraft, glm::vec3(10.0, 2.0, -17.5));
 
 	modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(23.0, 0.0, 0.0));
-	modelMatrix_LamboFLW = glm::translate(modelMatrix_LamboFLW, glm::vec3(23.93, 0.0, 1.58));
-	modelMatrix_LamboFRW = glm::translate(modelMatrix_LamboFRW, glm::vec3(22.07, 0.0, 1.58));
+	modelMatrix_LamboFLW = glm::translate(modelMatrix_LamboFLW, glm::vec3(23.93, 0.0, -1.58));
+	modelMatrix_LamboFRW = glm::translate(modelMatrix_LamboFRW, glm::vec3(22.07, 0.0, -1.58));
 	modelMatrix_LamboRLW = glm::translate(modelMatrix_LamboRLW, glm::vec3(23.93, 0.0, 1.39));
 	modelMatrix_LamboRRW = glm::translate(modelMatrix_LamboRRW, glm::vec3(22.07, 0.0, 1.39));
 
