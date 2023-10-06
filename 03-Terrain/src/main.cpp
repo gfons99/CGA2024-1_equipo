@@ -140,6 +140,12 @@ glm::mat4 modelMatrixEclipse = glm::mat4(1.0f);
 glm::mat4 matrixModelRock = glm::mat4(1.0);
 glm::mat4 modelMatrixHeli = glm::mat4(1.0f);
 glm::mat4 modelMatrixLambo = glm::mat4(1.0);
+
+glm::mat4 modelMatrix_LamboFLW = glm::mat4(1.0);
+glm::mat4 modelMatrix_LamboFRW = glm::mat4(1.0);
+glm::mat4 modelMatrix_LamboRLW = glm::mat4(1.0);
+glm::mat4 modelMatrix_LamboRRW = glm::mat4(1.0);
+
 glm::mat4 modelMatrixAircraft = glm::mat4(1.0);
 glm::mat4 modelMatrixDart = glm::mat4(1.0f);
 glm::mat4 modelMatrixBuzz = glm::mat4(1.0f);
@@ -383,7 +389,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	cyborgModelAnimate.loadModel("../models/cyborg/cyborg.fbx");
 	cyborgModelAnimate.setShader(&shaderMulLighting);
 
-		// lily
+	// lily
 	modelLily.loadModel("../models/Lily/ArturiaLily.fbx");
 	modelLily.setShader(&shaderMulLighting);
 
@@ -708,7 +714,7 @@ bool processInput(bool continueApplication)
 	{
 		enableCountSelected = false;
 		modelSelected++;
-		if (modelSelected > 5)
+		if (modelSelected > 6)
 			modelSelected = 0;
 		if (modelSelected == 1)
 			fileName = "../animaciones/animation_dart_joints.txt";
@@ -860,7 +866,7 @@ bool processInput(bool continueApplication)
 		animationMayowIndex = 0;
 	}
 
-		// Movimientos de [Lily]
+	// Movimientos de [Lily]
 	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 	{
 		modelMatrixLily = glm::rotate(modelMatrixLily, 0.02f, glm::vec3(0, 1, 0));
@@ -887,6 +893,42 @@ bool processInput(bool continueApplication)
 	else
 		numAni_Lily = 1;
 
+	// Movimientos de [Lambo]
+	if (modelSelected == 6 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		modelMatrixLambo = glm::rotate(modelMatrixLambo, 0.02f, glm::vec3(0, 1, 0));
+		modelMatrix_LamboFLW = glm::rotate(modelMatrix_LamboFLW, 0.02f, glm::vec3(0, 1, 0));
+		modelMatrix_LamboFRW = glm::rotate(modelMatrix_LamboFRW, 0.02f, glm::vec3(0, 1, 0));
+		modelMatrix_LamboRLW = glm::rotate(modelMatrix_LamboRLW, 0.02f, glm::vec3(0, 1, 0));
+		modelMatrix_LamboRRW = glm::rotate(modelMatrix_LamboRRW, 0.02f, glm::vec3(0, 1, 0));
+	}
+	else if (modelSelected == 6 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		modelMatrixLambo = glm::rotate(modelMatrixLambo, -0.02f, glm::vec3(0, 1, 0));
+		modelMatrix_LamboFLW = glm::rotate(modelMatrix_LamboFLW, -0.02f, glm::vec3(0, 1, 0));
+		modelMatrix_LamboFRW = glm::rotate(modelMatrix_LamboFRW, -0.02f, glm::vec3(0, 1, 0));
+		modelMatrix_LamboRLW = glm::rotate(modelMatrix_LamboRLW, -0.02f, glm::vec3(0, 1, 0));
+		modelMatrix_LamboRRW = glm::rotate(modelMatrix_LamboRRW, -0.02f, glm::vec3(0, 1, 0));
+	}
+
+	if (modelSelected == 6 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(0.0, 0.0, 0.2));
+		modelMatrix_LamboFLW = glm::translate(modelMatrix_LamboFLW, glm::vec3(0.0, 0.0, 0.2));
+		modelMatrix_LamboFRW = glm::translate(modelMatrix_LamboFRW, glm::vec3(0.0, 0.0, 0.2));
+		modelMatrix_LamboRLW = glm::translate(modelMatrix_LamboRLW, glm::vec3(0.0, 0.0, 0.2));
+		modelMatrix_LamboRRW = glm::translate(modelMatrix_LamboRRW, glm::vec3(0.0, 0.0, 0.2));
+	}
+	else if (modelSelected == 6 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(0.0, 0.0, -0.2));
+		modelMatrix_LamboFLW = glm::translate(modelMatrix_LamboFLW, glm::vec3(0.0, 0.0, -0.2));
+		modelMatrix_LamboFRW = glm::translate(modelMatrix_LamboFRW, glm::vec3(0.0, 0.0, -0.2));
+		modelMatrix_LamboRLW = glm::translate(modelMatrix_LamboRLW, glm::vec3(0.0, 0.0, -0.2));
+		modelMatrix_LamboRRW = glm::translate(modelMatrix_LamboRRW, glm::vec3(0.0, 0.0, -0.2));
+		
+	}
+
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -912,6 +954,11 @@ void applicationLoop()
 	modelMatrixAircraft = glm::translate(modelMatrixAircraft, glm::vec3(10.0, 2.0, -17.5));
 
 	modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(23.0, 0.0, 0.0));
+	modelMatrix_LamboFLW = glm::translate(modelMatrix_LamboFLW, glm::vec3(23.93, 0.0, 1.58));
+	modelMatrix_LamboFRW = glm::translate(modelMatrix_LamboFRW, glm::vec3(22.07, 0.0, 1.58));
+	modelMatrix_LamboRLW = glm::translate(modelMatrix_LamboRLW, glm::vec3(23.93, 0.0, 1.39));
+	modelMatrix_LamboRRW = glm::translate(modelMatrix_LamboRRW, glm::vec3(22.07, 0.0, 1.39));
+
 
 	modelMatrixDart = glm::translate(modelMatrixDart, glm::vec3(3.0, 0.0, 20.0));
 
@@ -1066,20 +1113,97 @@ void applicationLoop()
 
 		// Lambo car
 		glDisable(GL_CULL_FACE);
-		glm::mat4 modelMatrixLamboChasis = glm::mat4(modelMatrixLambo);
-		modelMatrixLamboChasis = glm::scale(modelMatrixLamboChasis, glm::vec3(1.3, 1.3, 1.3));
-		modelLambo.render(modelMatrixLamboChasis);
+
+		// Para que camine sobre el plano
+		modelMatrixLambo[3][1] = terrain.getHeightTerrain(
+			modelMatrixLambo[3][0], modelMatrixLambo[3][2]);
+		modelMatrix_LamboFLW[3][1] = terrain.getHeightTerrain(
+			modelMatrix_LamboFLW[3][0], modelMatrix_LamboFLW[3][2]);
+		modelMatrix_LamboFRW[3][1] = terrain.getHeightTerrain(
+			modelMatrix_LamboFRW[3][0], modelMatrix_LamboFRW[3][2]);
+		modelMatrix_LamboRLW[3][1] = terrain.getHeightTerrain(
+			modelMatrix_LamboRLW[3][0], modelMatrix_LamboRLW[3][2]);
+		modelMatrix_LamboRRW[3][1] = terrain.getHeightTerrain(
+			modelMatrix_LamboRRW[3][0], modelMatrix_LamboRRW[3][2]);
+
+		// Para que se incline respecto a la normal
+        glm::vec3 ejey_LamboFLW = glm::normalize(
+            terrain.getNormalTerrain(
+			modelMatrix_LamboFLW[3][0], modelMatrix_LamboFLW[3][2]));
+        glm::vec3 ejez_LamboFLW = glm::normalize(modelMatrix_LamboFLW[2]);
+        glm::vec3 ejex_LamboFLW = glm::normalize(glm::cross(ejey_LamboFLW, ejez_LamboFLW));
+        ejez_LamboFLW = glm::normalize(glm::cross(ejex_LamboFLW,ejey_LamboFLW));
+        modelMatrix_LamboFLW[0] = glm::vec4(ejex_LamboFLW, 0.0);
+        modelMatrix_LamboFLW[1] = glm::vec4(ejey_LamboFLW, 0.0);
+        modelMatrix_LamboFLW[2] = glm::vec4(ejez_LamboFLW, 0.0);
+
+		// Para que se incline respecto a la normal
+        glm::vec3 ejey_LamboFRW = glm::normalize(
+            terrain.getNormalTerrain(
+			modelMatrix_LamboFRW[3][0], modelMatrix_LamboFRW[3][2]));
+        glm::vec3 ejez_LamboFRW = glm::normalize(modelMatrix_LamboFRW[2]);
+        glm::vec3 ejex_LamboFRW = glm::normalize(glm::cross(ejey_LamboFRW, ejez_LamboFRW));
+        ejez_LamboFRW = glm::normalize(glm::cross(ejex_LamboFRW,ejey_LamboFRW));
+        modelMatrix_LamboFRW[0] = glm::vec4(ejex_LamboFRW, 0.0);
+        modelMatrix_LamboFRW[1] = glm::vec4(ejey_LamboFRW, 0.0);
+        modelMatrix_LamboFRW[2] = glm::vec4(ejez_LamboFRW, 0.0);
+
+		// Para que se incline respecto a la normal
+        glm::vec3 ejey_LamboRLW = glm::normalize(
+            terrain.getNormalTerrain(
+			modelMatrix_LamboRLW[3][0], modelMatrix_LamboRLW[3][2]));
+        glm::vec3 ejez_LamboRLW = glm::normalize(modelMatrix_LamboRLW[2]);
+        glm::vec3 ejex_LamboRLW = glm::normalize(glm::cross(ejey_LamboRLW, ejez_LamboRLW));
+        ejez_LamboRLW = glm::normalize(glm::cross(ejex_LamboRLW,ejey_LamboRLW));
+        modelMatrix_LamboRLW[0] = glm::vec4(ejex_LamboRLW, 0.0);
+        modelMatrix_LamboRLW[1] = glm::vec4(ejey_LamboRLW, 0.0);
+        modelMatrix_LamboRLW[2] = glm::vec4(ejez_LamboRLW, 0.0);
+
+		// Para que se incline respecto a la normal
+        glm::vec3 ejey_LamboRRW = glm::normalize(
+            terrain.getNormalTerrain(
+			modelMatrix_LamboRRW[3][0], modelMatrix_LamboRRW[3][2]));
+        glm::vec3 ejez_LamboRRW = glm::normalize(modelMatrix_LamboRRW[2]);
+        glm::vec3 ejex_LamboRRW = glm::normalize(glm::cross(ejey_LamboRRW, ejez_LamboRRW));
+        ejez_LamboRRW = glm::normalize(glm::cross(ejex_LamboRRW,ejey_LamboRRW));
+        modelMatrix_LamboRRW[0] = glm::vec4(ejex_LamboRRW, 0.0);
+        modelMatrix_LamboRRW[1] = glm::vec4(ejey_LamboRRW, 0.0);
+        modelMatrix_LamboRRW[2] = glm::vec4(ejez_LamboRRW, 0.0);
+
+		glm::vec3 ejex_chasis = ejex_LamboFLW + ejex_LamboFRW + ejex_LamboRLW + ejex_LamboRRW;
+		glm::vec3 ejey_chasis = ejey_LamboFLW + ejey_LamboFRW + ejey_LamboRLW + ejey_LamboRRW;
+		glm::vec3 ejez_chasis = ejez_LamboFLW + ejez_LamboFRW + ejez_LamboRLW + ejez_LamboRRW;
+		
+		ejex_chasis = glm::normalize(ejex_chasis);
+		ejey_chasis = glm::normalize(ejey_chasis);
+		ejez_chasis = glm::normalize(ejez_chasis);
+
+		modelMatrixLambo[0] = glm::vec4(ejex_chasis, 0.0);
+        modelMatrixLambo[1] = glm::vec4(ejey_chasis, 0.0);
+        modelMatrixLambo[2] = glm::vec4(ejez_chasis, 0.0);
+
+		// modelMatrixLambo[0] = glm::vec4(ejex_LamboFLW, 0.0);
+        // modelMatrixLambo[1] = glm::vec4(ejey_LamboFLW, 0.0);
+        // modelMatrixLambo[2] = glm::vec4(ejez_LamboFLW, 0.0);		
+
+		// *************************
+
+		glm::mat4 renderMatrix_lambochasis = glm::mat4(modelMatrixLambo);
+		// glm::mat4 renderMatrix_aux = glm::mat4(modelMatrix_LamboFLW);
+		renderMatrix_lambochasis = glm::scale(renderMatrix_lambochasis, glm::vec3(1.3, 1.3, 1.3));
+		modelLambo.render(renderMatrix_lambochasis);
 		glActiveTexture(GL_TEXTURE0);
-		glm::mat4 modelMatrixLamboLeftDor = glm::mat4(modelMatrixLamboChasis);
-		modelMatrixLamboLeftDor = glm::translate(modelMatrixLamboLeftDor, glm::vec3(1.08866, 0.705743, 0.968917));
-		modelMatrixLamboLeftDor = glm::rotate(modelMatrixLamboLeftDor, glm::radians(dorRotCount), glm::vec3(1.0, 0, 0));
-		modelMatrixLamboLeftDor = glm::translate(modelMatrixLamboLeftDor, glm::vec3(-1.08866, -0.705743, -0.968917));
-		modelLamboLeftDor.render(modelMatrixLamboLeftDor);
-		modelLamboRightDor.render(modelMatrixLamboChasis);
-		modelLamboFrontLeftWheel.render(modelMatrixLamboChasis);
-		modelLamboFrontRightWheel.render(modelMatrixLamboChasis);
-		modelLamboRearLeftWheel.render(modelMatrixLamboChasis);
-		modelLamboRearRightWheel.render(modelMatrixLamboChasis);
+		glm::mat4 renderMatrix_lamboleftdoor = glm::mat4(renderMatrix_lambochasis);
+		renderMatrix_lamboleftdoor = glm::translate(renderMatrix_lamboleftdoor, glm::vec3(1.08866, 0.705743, 0.968917));
+		renderMatrix_lamboleftdoor = glm::rotate(renderMatrix_lamboleftdoor, glm::radians(dorRotCount), glm::vec3(1.0, 0, 0));
+		renderMatrix_lamboleftdoor = glm::translate(renderMatrix_lamboleftdoor, glm::vec3(-1.08866, -0.705743, -0.968917));
+		
+		modelLamboLeftDor.render(renderMatrix_lamboleftdoor);
+		modelLamboRightDor.render(renderMatrix_lambochasis);
+		modelLamboFrontLeftWheel.render(renderMatrix_lambochasis);
+		modelLamboFrontRightWheel.render(renderMatrix_lambochasis);
+		modelLamboRearLeftWheel.render(renderMatrix_lambochasis);
+		modelLamboRearRightWheel.render(renderMatrix_lambochasis);
 		// Se regresa el cull faces IMPORTANTE para las puertas
 		glEnable(GL_CULL_FACE);
 
@@ -1176,7 +1300,7 @@ void applicationLoop()
 				modelMatrixMayow[3][0], modelMatrixMayow[3][2]));
 		glm::vec3 ejez = glm::normalize(modelMatrixMayow[2]);
 		glm::vec3 ejex = glm::normalize(glm::cross(ejey, ejez));
-		ejez = glm::normalize(glm::cross(ejex,ejey));
+		ejez = glm::normalize(glm::cross(ejex, ejey));
 		modelMatrixMayow[0] = glm::vec4(ejex, 0.0);
 		modelMatrixMayow[1] = glm::vec4(ejey, 0.0);
 		modelMatrixMayow[2] = glm::vec4(ejez, 0.0);
@@ -1216,10 +1340,10 @@ void applicationLoop()
 				modelMatrixLily[3][0], modelMatrixLily[3][2]));
 		glm::vec3 ejez_lily = glm::normalize(modelMatrixLily[2]);
 		glm::vec3 ejex_lily = glm::normalize(glm::cross(ejey_lily, ejez_lily));
-		ejez_lily = glm::normalize(glm::cross(ejex_lily,ejey_lily));
+		ejez_lily = glm::normalize(glm::cross(ejex_lily, ejey_lily));
 		modelMatrixLily[0] = glm::vec4(ejex_lily, 0.0);
 		modelMatrixLily[1] = glm::vec4(ejey_lily, 0.0);
-		modelMatrixLily[2] = glm::vec4(ejez_lily, 0.0);		
+		modelMatrixLily[2] = glm::vec4(ejez_lily, 0.0);
 
 		glm::mat4 renderMatrixLily = glm::mat4(modelMatrixLily);
 		renderMatrixLily = glm::scale(renderMatrixLily, glm::vec3(0.02f, 0.02f, 0.02f));
