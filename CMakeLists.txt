@@ -5,4 +5,5 @@ add_subdirectory(CGALib)
 add_subdirectory(02-SkeletonAnimation)
 add_subdirectory(03-Terrain)
 add_subdirectory(04-TerrainBlendMap)
+add_subdirectory(05-MultipleLights)
 
