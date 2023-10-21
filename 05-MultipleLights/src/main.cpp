@@ -219,9 +219,10 @@ std::vector<glm::vec3> lamp2Position = {
 	glm::vec3(-36.52, 0.0, -23.24),
 	glm::vec3(-52.73, 0.0, -3.8),
 	glm::vec3(56.18, 0.0, 51.56),
+	glm::vec3(0.0, 0.0, 0.0),
 };
 std::vector<float> lamp2Orientarion = {
-	110.0, 25.0, 0.0}; // ángulo_1, ángulo_2, ángulo_3
+	110.0, 25.0, 0.0, 0.0}; // ángulo_1, ángulo_2, ángulo_3
 
 double deltaTime;
 double currTime, lastTime;
@@ -1152,6 +1153,7 @@ void applicationLoop()
 		// Usamos size() para determinar el número de lámparas que tenemos
 		shaderMulLighting.setInt("pointLightCount", lamp1Position.size() + lamp2Position.size());
 		shaderTerrain.setInt("pointLightCount", lamp1Position.size() + lamp2Position.size());
+		
 		for (int i = 0; i < lamp1Position.size(); i++)
 		{
 			glm::mat4 matrixAdjustLamp = glm::mat4(1.0);
@@ -1205,7 +1207,8 @@ void applicationLoop()
 			glm::mat4 matrixAdjustLamp = glm::mat4(1.0);
 			// Se recomienda rotar primera para mantener la precisión
 			matrixAdjustLamp = glm::translate(matrixAdjustLamp, lamp2Position[i]);
-			matrixAdjustLamp = glm::rotate(matrixAdjustLamp, glm::radians(lamp2Orientarion[i]), glm::vec3(0, 1, 0));
+			matrixAdjustLamp = glm::rotate(
+				matrixAdjustLamp, glm::radians(lamp2Orientarion[i]), glm::vec3(0, 1, 0));
 			matrixAdjustLamp = glm::scale(matrixAdjustLamp, glm::vec3(1.0));
 			matrixAdjustLamp = glm::translate(matrixAdjustLamp, glm::vec3(0.74, 5.04, 0.0));
 			glm::vec3 lampPosition = glm::vec3(matrixAdjustLamp[3]);
@@ -1340,7 +1343,9 @@ void applicationLoop()
 		// Se regresa el cull faces IMPORTANTE para las puertas
 		glEnable(GL_CULL_FACE);
 
-		// Render lamps
+		/*******************************************
+		 * Render lamps
+		 *******************************************/
 		for (int i = 0; i < lamp1Position.size(); i++)
 		{
 			lamp1Position[i].y = terrain.getHeightTerrain(lamp1Position[i].x, lamp1Position[i].z);
