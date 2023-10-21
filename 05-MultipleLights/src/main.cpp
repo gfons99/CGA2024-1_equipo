@@ -216,7 +216,8 @@ float dorRotCount = 0.0;
 
 //bandera Faros
 bool DirFaros = true;
-int posDir = 1;
+int posDirX = 0;
+int posDirO = 0;
 
 // Lamps position
 std::vector<glm::vec3> lamp1Position = {
@@ -1026,7 +1027,8 @@ bool processInput(bool continueApplication)
 
 	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-		posDir=1;
+		posDirO=1;
+		posDirX=-0.5;
 		modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(0.0, 0.0, 0.2));
 		modelMatrix_LamboFLW = glm::translate(modelMatrix_LamboFLW, glm::vec3(0.0, 0.0, 0.2));
 		modelMatrix_LamboFRW = glm::translate(modelMatrix_LamboFRW, glm::vec3(0.0, 0.0, 0.2));
@@ -1035,7 +1037,8 @@ bool processInput(bool continueApplication)
 	}
 	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		posDir=-1;
+		posDirO=-1;
+		posDirX=1.8;
 		modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(0.0, 0.0, -0.2));
 		modelMatrix_LamboFLW = glm::translate(modelMatrix_LamboFLW, glm::vec3(0.0, 0.0, -0.2));
 		modelMatrix_LamboFRW = glm::translate(modelMatrix_LamboFRW, glm::vec3(0.0, 0.0, -0.2));
@@ -1223,10 +1226,10 @@ void applicationLoop()
 		
 		
 		// XYZ_pivote, coordenada homgenea  Lambo Faro 1
-		glm::vec3 spot1Position = glm::vec3(modelMatrixLambo * glm::vec4(0.775, 0.224, -0.647, 1.0));
+		glm::vec3 spot1Position = glm::vec3(modelMatrixLambo * glm::vec4(0.775, posDirX, -0.647, 1.0));
 
 		
-		glm::mat4 spot1Direction = glm::rotate(modelMatrixLambo, glm::radians(-90.0f), glm::vec3(0.1, posDir, 0));
+		glm::mat4 spot1Direction = glm::rotate(modelMatrixLambo, glm::radians(-90.0f), glm::vec3(0.0, posDirO, 0));
 		
 
 		shaderMulLighting.setVectorFloat3(
@@ -1282,8 +1285,8 @@ void applicationLoop()
 			"spotLights[1].outerCutOff", cos(glm::radians(15.0f)));
 
 			// XYZ_pivote, coordenada homgenea  Lambo Faro 2
-		glm::vec3 spot2Position = glm::vec3(modelMatrixLambo * glm::vec4(-0.775, 0.224, -0.647, 1.0));
-		glm::mat4 spot2Direction = glm::rotate(modelMatrixLambo, glm::radians(-90.0f), glm::vec3(0, posDir, 0));
+		glm::vec3 spot2Position = glm::vec3(modelMatrixLambo * glm::vec4(-0.775, posDirX, -0.647, 1.0));
+		glm::mat4 spot2Direction = glm::rotate(modelMatrixLambo, glm::radians(-90.0f), glm::vec3(0, posDirO, 0));
 
 		shaderMulLighting.setVectorFloat3(
 			"spotLights[2].light.ambient",
