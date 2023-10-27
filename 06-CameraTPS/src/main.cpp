@@ -54,9 +54,11 @@ Shader shaderMulLighting;
 // Shader para el terreno
 Shader shaderTerrain;
 
-// std::shared_ptr<FirstPersonCamera> camera(new FirstPersonCamera());
+std::shared_ptr<FirstPersonCamera> cameraFP(new FirstPersonCamera());
 std::shared_ptr<Camera> camera(new ThirdPersonCamera());
-float distanceFromTarget = 7.0;
+float distanceFromTarget = 9.0;
+
+bool cameraState=true;
 
 Sphere skyboxSphere(20, 20);
 Box boxCesped;
@@ -110,6 +112,8 @@ Model cowboyModelAnimate;
 Model guardianModelAnimate;
 // Cybog
 Model cyborgModelAnimate;
+//lily
+Model modelLily;
 // Terrain model instance
 Terrain terrain(-1, -1, 200, 8, "../Textures/heightmap.png");
 
@@ -148,6 +152,8 @@ glm::mat4 modelMatrixMayow = glm::mat4(1.0f);
 glm::mat4 modelMatrixCowboy = glm::mat4(1.0f);
 glm::mat4 modelMatrixGuardian = glm::mat4(1.0f);
 glm::mat4 modelMatrixCyborg = glm::mat4(1.0f);
+glm::mat4 modelMatrixLily = glm::mat4(1.0f);
+
 
 int animationMayowIndex = 1;
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
@@ -196,6 +202,9 @@ float rotHelHelBack = 0.0;
 // Var animate lambo dor
 int stateDoor = 0;
 float dorRotCount = 0.0;
+
+// Variables de animación [Lily]
+int numAni_Lily = 0;
 
 // Lamps position
 std::vector<glm::vec3> lamp1Position = {
@@ -403,6 +412,10 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	// Cyborg
 	cyborgModelAnimate.loadModel("../models/cyborg/cyborg.fbx");
 	cyborgModelAnimate.setShader(&shaderMulLighting);
+
+	//lily
+	modelLily.loadModel("../models/Lily/ArturiaLily.fbx");
+	modelLily.setShader(&shaderMulLighting);
 
 	// Terreno
 	terrain.init();
@@ -723,6 +736,7 @@ void destroy()
 	cowboyModelAnimate.destroy();
 	guardianModelAnimate.destroy();
 	cyborgModelAnimate.destroy();
+	modelLily.destroy();
 
 	// Terrains objects Delete
 	terrain.destroy();
@@ -806,23 +820,23 @@ bool processInput(bool continueApplication)
 		return false;
 	}
 
-	// if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-	// 	camera->moveFrontCamera(true, deltaTime);
-	// if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-	// 	camera->moveFrontCamera(false, deltaTime);
-	// if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-	// 	camera->moveRightCamera(false, deltaTime);
-	// if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-	// 	camera->moveRightCamera(true, deltaTime);
-	// if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	// 	camera->mouseMoveCamera(offsetX, offsetY, deltaTime);
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-		camera->mouseMoveCamera(offsetX, 0, deltaTime);
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-		camera->mouseMoveCamera(0, offsetY, deltaTime);
-
-	offsetX = 0;
-	offsetY = 0;
+	if (cameraState) {
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT))
+			camera->mouseMoveCamera(offsetX, 0, deltaTime);
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT))
+			camera->mouseMoveCamera(0, offsetY, deltaTime);
+	} else{
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			cameraFP->moveFrontCamera(true, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			cameraFP->moveFrontCamera(false, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			cameraFP->moveRightCamera(false, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			cameraFP->moveRightCamera(true, deltaTime);
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+			cameraFP->mouseMoveCamera(offsetX, offsetY, deltaTime);
+	}
 
 	// Seleccionar modelo
 	if (enableCountSelected && glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
@@ -981,6 +995,38 @@ bool processInput(bool continueApplication)
 		animationMayowIndex = 0;
 	}
 
+		// Movimientos de [Lily]
+	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		modelMatrixLily = glm::rotate(modelMatrixLily, 0.02f, glm::vec3(0, 1, 0));
+		numAni_Lily = 0;
+	}
+	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		modelMatrixLily = glm::rotate(modelMatrixLily, -0.02f, glm::vec3(0, 1, 0));
+		numAni_Lily = 0;
+	}
+	else
+		numAni_Lily = 1;
+
+	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.0, 0.0, 0.02));
+		numAni_Lily = 0;
+	}
+	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.0, 0.0, -0.02));
+		numAni_Lily = 0;
+	}
+	else{
+		numAni_Lily = 1;
+	}
+	// Cambiar tipo de camara
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS
+		&& glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
+		cameraState = !cameraState;
+	}
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -992,6 +1038,7 @@ void applicationLoop()
 	float angleTarget;
 	glm::vec3 axis;
 	glm::vec3 target;
+	glm::mat4 view;
 
 	modelMatrixEclipse = glm::translate(modelMatrixEclipse, glm::vec3(27.5, 0, 30.0));
 	modelMatrixEclipse = glm::rotate(modelMatrixEclipse, glm::radians(180.0f), glm::vec3(0, 1, 0));
@@ -1056,6 +1103,57 @@ void applicationLoop()
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 												(float)screenWidth / (float)screenHeight, 0.01f, 100.0f);
+	
+	//------------------------
+
+	
+		if (cameraState) {
+			if (modelSelected == 1)
+		{
+			// La columna 3 contiene la posición del modelo
+			target = modelMatrixDart[3];
+			angleTarget = glm::angle(glm::quat_cast(modelMatrixDart));
+			axis = glm::axis(glm::quat_cast(modelMatrixDart));
+		}
+		else if(modelSelected == 2){
+
+			target = modelMatrixLily[3];
+			angleTarget = glm::angle(glm::quat_cast(modelMatrixLily));
+			axis = glm::axis(glm::quat_cast(modelMatrixLily));
+		}
+		else // (modelSelected == 2)
+		{
+			target = modelMatrixMayow[3];
+			angleTarget = glm::angle(glm::quat_cast(modelMatrixMayow));
+			axis = glm::axis(glm::quat_cast(modelMatrixMayow));
+		}
+		if(std::isnan(angleTarget))
+		{
+			angleTarget = 0;
+		}
+		if(axis.y < 0)
+		{
+			angleTarget = -angleTarget;
+		}
+		if (modelSelected == 1)
+		{
+			angleTarget -= glm::radians(90.0);
+		}
+		camera -> setAngleTarget(angleTarget);
+		camera -> setCameraTarget(target);
+		camera -> updateCamera();
+
+		view = camera->getViewMatrix();
+		}
+		else {
+
+			view = cameraFP->getViewMatrix();
+			cameraFP->setPosition(target);
+		}
+
+
+	//--------------------------
+			/*
 		if (modelSelected == 1)
 		{
 			// La columna 3 contiene la posición del modelo
@@ -1085,7 +1183,7 @@ void applicationLoop()
 		camera -> setCameraTarget(target);
 		camera -> updateCamera();
 
-		glm::mat4 view = camera->getViewMatrix();
+		glm::mat4 view = camera->getViewMatrix();*/
 
 		// Settea la matriz de vista y projection al shader con solo color
 		shader.setMatrix4("projection", 1, false, glm::value_ptr(projection));
@@ -1429,6 +1527,29 @@ void applicationLoop()
 		modelMatrixCyborgBody = glm::scale(modelMatrixCyborgBody, glm::vec3(0.009f));
 		cyborgModelAnimate.setAnimationIndex(1);
 		cyborgModelAnimate.render(modelMatrixCyborgBody);
+
+
+		// [Lily]
+		// Para que camine sobre el plano
+		modelMatrixLily[3][1] = terrain.getHeightTerrain(
+			modelMatrixLily[3][0], modelMatrixLily[3][2]);
+		// Para que se incline respecto a la normal
+		glm::vec3 ejey_lily = glm::normalize(
+			terrain.getNormalTerrain(
+				modelMatrixLily[3][0], modelMatrixLily[3][2]));
+		glm::vec3 ejez_lily = glm::normalize(modelMatrixLily[2]);
+		glm::vec3 ejex_lily = glm::normalize(glm::cross(ejey_lily, ejez_lily));
+		ejez_lily = glm::normalize(glm::cross(ejex_lily, ejey_lily));
+		modelMatrixLily[0] = glm::vec4(ejex_lily, 0.0);
+		modelMatrixLily[1] = glm::vec4(ejey_lily, 0.0);
+		modelMatrixLily[2] = glm::vec4(ejez_lily, 0.0);
+
+		glm::mat4 renderMatrixLily = glm::mat4(modelMatrixLily);
+		renderMatrixLily = glm::scale(renderMatrixLily, glm::vec3(0.02f, 0.02f, 0.02f));
+
+		modelLily.setAnimationIndex(numAni_Lily);
+		modelLily.render(renderMatrixLily);
+
 
 		/*******************************************
 		 * Skybox
