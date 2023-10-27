@@ -125,12 +125,21 @@ GLenum types[6] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z};
 
-std::string fileNames[6] = {"../Textures/mp_bloodvalley/blood-valley_ft.tga",
-							"../Textures/mp_bloodvalley/blood-valley_bk.tga",
-							"../Textures/mp_bloodvalley/blood-valley_up.tga",
-							"../Textures/mp_bloodvalley/blood-valley_dn.tga",
-							"../Textures/mp_bloodvalley/blood-valley_rt.tga",
-							"../Textures/mp_bloodvalley/blood-valley_lf.tga"};
+std::string fileNames[6] = { 
+		"../Textures/belfast_sunset_puresky/puresky_ft.tga",
+		"../Textures/belfast_sunset_puresky/puresky_bk.tga",
+		"../Textures/belfast_sunset_puresky/puresky_up.tga",
+		"../Textures/belfast_sunset_puresky/puresky_dn.tga",
+		"../Textures/belfast_sunset_puresky/puresky_rt.tga",
+		"../Textures/belfast_sunset_puresky/puresky_lf.tga" };
+
+// std::string fileNames[6] = { 
+// 		"../Textures/testsky_up_no_rle_compression/test_ft.tga",
+// 		"../Textures/testsky_up_no_rle_compression/test_bk.tga",
+// 		"../Textures/testsky_up_no_rle_compression/test_up.tga",
+// 		"../Textures/testsky_up_no_rle_compression/test_dn.tga",
+// 		"../Textures/testsky_up_no_rle_compression/test_rt.tga",
+// 		"../Textures/testsky_up_no_rle_compression/test_lf.tga" };
 
 bool exitApp = false;
 int lastMousePosX, offsetX = 0;
@@ -1060,12 +1069,14 @@ void applicationLoop()
 		{
 			// La columna 3 contiene la posición del modelo
 			target = modelMatrixDart[3];
+			target = target  + glm::vec3(0.0, 3.0, 0.0);
 			angleTarget = glm::angle(glm::quat_cast(modelMatrixDart));
 			axis = glm::axis(glm::quat_cast(modelMatrixDart));
 		}
 		else // (modelSelected == 2)
 		{
 			target = modelMatrixMayow[3];
+			target = target  + glm::vec3(0.0, 1.0, 0.0);
 			angleTarget = glm::angle(glm::quat_cast(modelMatrixMayow));
 			axis = glm::axis(glm::quat_cast(modelMatrixMayow));
 		}
@@ -1110,14 +1121,15 @@ void applicationLoop()
 		/*******************************************
 		 * Propiedades Luz direccional
 		 *******************************************/
+		float sol_ambient = 0.2;
 		shaderMulLighting.setVectorFloat3("viewPos", glm::value_ptr(camera->getPosition()));
-		shaderMulLighting.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(0.05, 0.05, 0.05)));
+		shaderMulLighting.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(sol_ambient, sol_ambient, sol_ambient)));
 		shaderMulLighting.setVectorFloat3("directionalLight.light.diffuse", glm::value_ptr(glm::vec3(0.3, 0.3, 0.3)));
 		shaderMulLighting.setVectorFloat3("directionalLight.light.specular", glm::value_ptr(glm::vec3(0.4, 0.4, 0.4)));
 		shaderMulLighting.setVectorFloat3("directionalLight.direction", glm::value_ptr(glm::vec3(-1.0, 0.0, 0.0)));
 
 		shaderTerrain.setVectorFloat3("viewPos", glm::value_ptr(camera->getPosition()));
-		shaderTerrain.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(0.05, 0.05, 0.05)));
+		shaderTerrain.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(sol_ambient, sol_ambient, sol_ambient)));
 		shaderTerrain.setVectorFloat3("directionalLight.light.diffuse", glm::value_ptr(glm::vec3(0.3, 0.3, 0.3)));
 		shaderTerrain.setVectorFloat3("directionalLight.light.specular", glm::value_ptr(glm::vec3(0.4, 0.4, 0.4)));
 		shaderTerrain.setVectorFloat3("directionalLight.direction", glm::value_ptr(glm::vec3(-1.0, 0.0, 0.0)));
