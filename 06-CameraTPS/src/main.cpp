@@ -162,6 +162,7 @@ glm::mat4 modelMatrixCowboy = glm::mat4(1.0f);
 glm::mat4 modelMatrixGuardian = glm::mat4(1.0f);
 glm::mat4 modelMatrixCyborg = glm::mat4(1.0f);
 glm::mat4 modelMatrixLily = glm::mat4(1.0f);
+glm::mat4 frontMatrixLily = glm::mat4(1.0f);
 
 int animationMayowIndex = 1;
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
@@ -431,8 +432,8 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	terrain.setShader(&shaderTerrain);
 
 	// Nota. Para una cámara en tercera persona, no se ocupa un posición
-	camera1P->setPosition(glm::vec3(0.0, 0.0, 0.0));
-	camera1P->setDistanceFromTarget(distanceFromTarget);
+	// camera1P->setPosition(glm::vec3(0.0, 0.0, 0.0));
+	// camera1P->setDistanceFromTarget(distanceFromTarget);
 
 	camera3P->setPosition(glm::vec3(0.0, 3.0, 4.0));
 	camera3P->setSensitivity(1.0f);
@@ -802,7 +803,6 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 void scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
 	distanceFromTarget -= yoffset;
-	camera1P->setDistanceFromTarget(distanceFromTarget);
 	camera3P->setDistanceFromTarget(distanceFromTarget);
 }
 
@@ -1014,13 +1014,21 @@ bool processInput(bool continueApplication)
 	}
 
 	// Movimientos de [Lily]
+	frontMatrixLily = modelMatrixLily;
 	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-	{
+	{	
+		frontMatrixLily = glm::rotate(frontMatrixLily, 0.02f, glm::vec3(0, 1, 0));
+		frontMatrixLily = glm::translate(frontMatrixLily, glm::vec3(0.0, 0.0, 10.0));
+		
 		modelMatrixLily = glm::rotate(modelMatrixLily, 0.02f, glm::vec3(0, 1, 0));
 		numAni_Lily = 0;
 	}
 	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 	{
+		
+		frontMatrixLily = glm::rotate(frontMatrixLily, -0.02f, glm::vec3(0, 1, 0));
+		frontMatrixLily = glm::translate(frontMatrixLily, glm::vec3(0.0, 0.0, 10.0));
+
 		modelMatrixLily = glm::rotate(modelMatrixLily, -0.02f, glm::vec3(0, 1, 0));
 		numAni_Lily = 0;
 	}
@@ -1096,7 +1104,7 @@ void applicationLoop()
 
 	modelMatrixCyborg = glm::translate(modelMatrixCyborg, glm::vec3(5.0f, 0.05, 0.0f));
 
-	modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(20.0f, 0.0, -30.0f));
+	frontMatrixLily = modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(20.0f, 0.0, -30.0f));
 
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
@@ -1176,13 +1184,13 @@ void applicationLoop()
 		}
 		else
 		{
-			// glm::mat4 viewMatrixLily = glm::mat4(modelMatrixLily);
-			// viewMatrixLily = glm::scale(viewMatrixLily, glm::vec3(0.02f, 0.02f, 0.02f));
 			target = modelMatrixLily[3];
+
 			camera1P->setPosition(target + glm::vec3(0.0, 2.9, 0.0));
-			camera1P->setCameraTarget(target + glm::vec3(0.0, 10.0, 0.0));
-			camera1P->updateCamera();
-			view = camera1P->getViewMatrix();
+			// camera1P->setFront(frontMatrixLily[3]);
+			// camera1P->updateCamera();
+			view = camera1P->getViewMatrix_1P(frontMatrixLily[3]);
+			// view = camera1P->getViewMatrix();
 		}
 
 		// Settea la matriz de vista y projection al shader con solo color
