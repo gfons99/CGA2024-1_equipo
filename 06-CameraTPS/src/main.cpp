@@ -850,8 +850,8 @@ bool processInput(bool continueApplication)
 		// 	camera1P->moveRightCamera(false, deltaTime);
 		// if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		// 	camera1P->moveRightCamera(true, deltaTime);
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-			camera1P->mouseMoveCamera(offsetX, offsetY, deltaTime);
+		// if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+		// 	camera1P->mouseMoveCamera(offsetX, offsetY, deltaTime);
 	}
 	offsetX = 0;
 	offsetY = 0;
