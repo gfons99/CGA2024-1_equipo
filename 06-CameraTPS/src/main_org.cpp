@@ -54,11 +54,9 @@ Shader shaderMulLighting;
 // Shader para el terreno
 Shader shaderTerrain;
 
-std::shared_ptr<FirstPersonCamera> camera1P(new FirstPersonCamera());
-std::shared_ptr<ThirdPersonCamera> camera3P(new ThirdPersonCamera());
+// std::shared_ptr<FirstPersonCamera> camera(new FirstPersonCamera());
+std::shared_ptr<Camera> camera(new ThirdPersonCamera());
 float distanceFromTarget = 7.0;
-
-bool cameraState = true;
 
 Sphere skyboxSphere(20, 20);
 Box boxCesped;
@@ -112,8 +110,6 @@ Model cowboyModelAnimate;
 Model guardianModelAnimate;
 // Cybog
 Model cyborgModelAnimate;
-// [Lily]
-Model modelLily;
 // Terrain model instance
 Terrain terrain(-1, -1, 200, 8, "../Textures/heightmap.png");
 
@@ -129,21 +125,12 @@ GLenum types[6] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z};
 
-std::string fileNames[6] = {
-	"../Textures/belfast_sunset_puresky/puresky_ft.tga",
-	"../Textures/belfast_sunset_puresky/puresky_bk.tga",
-	"../Textures/belfast_sunset_puresky/puresky_up.tga",
-	"../Textures/belfast_sunset_puresky/puresky_dn.tga",
-	"../Textures/belfast_sunset_puresky/puresky_rt.tga",
-	"../Textures/belfast_sunset_puresky/puresky_lf.tga"};
-
-// std::string fileNames[6] = {
-// 		"../Textures/testsky_up_no_rle_compression/test_ft.tga",
-// 		"../Textures/testsky_up_no_rle_compression/test_bk.tga",
-// 		"../Textures/testsky_up_no_rle_compression/test_up.tga",
-// 		"../Textures/testsky_up_no_rle_compression/test_dn.tga",
-// 		"../Textures/testsky_up_no_rle_compression/test_rt.tga",
-// 		"../Textures/testsky_up_no_rle_compression/test_lf.tga" };
+std::string fileNames[6] = {"../Textures/mp_bloodvalley/blood-valley_ft.tga",
+							"../Textures/mp_bloodvalley/blood-valley_bk.tga",
+							"../Textures/mp_bloodvalley/blood-valley_up.tga",
+							"../Textures/mp_bloodvalley/blood-valley_dn.tga",
+							"../Textures/mp_bloodvalley/blood-valley_rt.tga",
+							"../Textures/mp_bloodvalley/blood-valley_lf.tga"};
 
 bool exitApp = false;
 int lastMousePosX, offsetX = 0;
@@ -161,14 +148,12 @@ glm::mat4 modelMatrixMayow = glm::mat4(1.0f);
 glm::mat4 modelMatrixCowboy = glm::mat4(1.0f);
 glm::mat4 modelMatrixGuardian = glm::mat4(1.0f);
 glm::mat4 modelMatrixCyborg = glm::mat4(1.0f);
-glm::mat4 modelMatrixLily = glm::mat4(1.0f);
 
 int animationMayowIndex = 1;
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
 float rotBuzzHead = 0.0, rotBuzzLeftarm = 0.0, rotBuzzLeftForeArm = 0.0, rotBuzzLeftHand = 0.0;
 int modelSelected = 0;
 bool enableCountSelected = true;
-bool enable_camera = true;
 
 // Variables to animations keyframes
 bool saveFrame = false, availableSave = true;
@@ -211,9 +196,6 @@ float rotHelHelBack = 0.0;
 // Var animate lambo dor
 int stateDoor = 0;
 float dorRotCount = 0.0;
-
-// Variables de animación [Lily]
-int numAni_Lily = 0;
 
 // Lamps position
 std::vector<glm::vec3> lamp1Position = {
@@ -422,21 +404,14 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	cyborgModelAnimate.loadModel("../models/cyborg/cyborg.fbx");
 	cyborgModelAnimate.setShader(&shaderMulLighting);
 
-	// [Lily]
-	modelLily.loadModel("../models/Lily/ArturiaLily.fbx");
-	modelLily.setShader(&shaderMulLighting);
-
 	// Terreno
 	terrain.init();
 	terrain.setShader(&shaderTerrain);
 
 	// Nota. Para una cámara en tercera persona, no se ocupa un posición
-	camera1P->setPosition(glm::vec3(0.0, 0.0, 0.0));
-	camera1P->setDistanceFromTarget(distanceFromTarget);
-
-	camera3P->setPosition(glm::vec3(0.0, 3.0, 4.0));
-	camera3P->setSensitivity(1.0f);
-	camera3P->setDistanceFromTarget(distanceFromTarget);
+	camera->setPosition(glm::vec3(0.0, 3.0, 4.0));
+	camera->setSensitivity(1.0f);
+	camera->setDistanceFromTarget(distanceFromTarget);
 
 	// Carga de texturas para el skybox
 	Texture skyboxTexture = Texture("");
@@ -748,7 +723,6 @@ void destroy()
 	cowboyModelAnimate.destroy();
 	guardianModelAnimate.destroy();
 	cyborgModelAnimate.destroy();
-	modelLily.destroy();
 
 	// Terrains objects Delete
 	terrain.destroy();
@@ -802,8 +776,7 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 void scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
 	distanceFromTarget -= yoffset;
-	camera1P->setDistanceFromTarget(distanceFromTarget);
-	camera3P->setDistanceFromTarget(distanceFromTarget);
+	camera->setDistanceFromTarget(distanceFromTarget);
 }
 
 void mouseButtonCallback(GLFWwindow *window, int button, int state, int mod)
@@ -833,26 +806,21 @@ bool processInput(bool continueApplication)
 		return false;
 	}
 
-	if (cameraState)
-	{
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-			camera3P->mouseMoveCamera(offsetX, 0, deltaTime);
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-			camera3P->mouseMoveCamera(0, offsetY, deltaTime);
-	}
-	else
-	{
-		// if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		// 	camera1P->moveFrontCamera(true, deltaTime);
-		// if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		// 	camera1P->moveFrontCamera(false, deltaTime);
-		// if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		// 	camera1P->moveRightCamera(false, deltaTime);
-		// if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		// 	camera1P->moveRightCamera(true, deltaTime);
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-			camera1P->mouseMoveCamera(offsetX, offsetY, deltaTime);
-	}
+	// if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	// 	camera->moveFrontCamera(true, deltaTime);
+	// if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	// 	camera->moveFrontCamera(false, deltaTime);
+	// if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	// 	camera->moveRightCamera(false, deltaTime);
+	// if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	// 	camera->moveRightCamera(true, deltaTime);
+	// if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	// 	camera->mouseMoveCamera(offsetX, offsetY, deltaTime);
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+		camera->mouseMoveCamera(offsetX, 0, deltaTime);
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+		camera->mouseMoveCamera(0, offsetY, deltaTime);
+
 	offsetX = 0;
 	offsetY = 0;
 
@@ -861,7 +829,7 @@ bool processInput(bool continueApplication)
 	{
 		enableCountSelected = false;
 		modelSelected++;
-		if (modelSelected > 5)
+		if (modelSelected > 4)
 			modelSelected = 0;
 		if (modelSelected == 1)
 			fileName = "../animaciones/animation_dart_joints.txt";
@@ -1013,44 +981,6 @@ bool processInput(bool continueApplication)
 		animationMayowIndex = 0;
 	}
 
-	// Movimientos de [Lily]
-	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-	{
-		modelMatrixLily = glm::rotate(modelMatrixLily, 0.02f, glm::vec3(0, 1, 0));
-		numAni_Lily = 0;
-	}
-	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-	{
-		modelMatrixLily = glm::rotate(modelMatrixLily, -0.02f, glm::vec3(0, 1, 0));
-		numAni_Lily = 0;
-	}
-	else
-		numAni_Lily = 1;
-
-	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-	{
-		modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.0, 0.0, 0.02));
-		numAni_Lily = 0;
-	}
-	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-	{
-		modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.0, 0.0, -0.02));
-		numAni_Lily = 0;
-	}
-	else
-	{
-		numAni_Lily = 1;
-	}
-	// Cambiar tipo de camara
-	if (enable_camera && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-	{
-		cameraState = !cameraState;
-		enable_camera = false;
-	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_RELEASE)
-	{
-		enable_camera = true;
-	}
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -1062,7 +992,6 @@ void applicationLoop()
 	float angleTarget;
 	glm::vec3 axis;
 	glm::vec3 target;
-	glm::mat4 view;
 
 	modelMatrixEclipse = glm::translate(modelMatrixEclipse, glm::vec3(27.5, 0, 30.0));
 	modelMatrixEclipse = glm::rotate(modelMatrixEclipse, glm::radians(180.0f), glm::vec3(0, 1, 0));
@@ -1096,8 +1025,6 @@ void applicationLoop()
 
 	modelMatrixCyborg = glm::translate(modelMatrixCyborg, glm::vec3(5.0f, 0.05, 0.0f));
 
-	modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(20.0f, 0.0, -30.0f));
-
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
 	keyFramesDartJoints = getKeyRotFrames(fileName);
@@ -1129,61 +1056,36 @@ void applicationLoop()
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 												(float)screenWidth / (float)screenHeight, 0.01f, 100.0f);
-
-		//------------------------
-
-		if (cameraState)
+		if (modelSelected == 1)
 		{
-			if (modelSelected == 1)
-			{
-				// La columna 3 contiene la posición del modelo
-				target = modelMatrixDart[3];
-				angleTarget = glm::angle(glm::quat_cast(modelMatrixDart));
-				axis = glm::axis(glm::quat_cast(modelMatrixDart));
-			}
-			else if (modelSelected == 2) // (modelSelected == 2)
-			{
-				target = modelMatrixMayow[3];
-				angleTarget = glm::angle(glm::quat_cast(modelMatrixMayow));
-				axis = glm::axis(glm::quat_cast(modelMatrixMayow));
-			}
-			else // if(modelSelected == 5)
-			{
-
-				target = modelMatrixLily[3];
-				target = target + glm::vec3(0.0, 2.0, 0.0);
-				angleTarget = glm::angle(glm::quat_cast(modelMatrixLily));
-				axis = glm::axis(glm::quat_cast(modelMatrixLily));
-			}
-
-			if (std::isnan(angleTarget))
-			{
-				angleTarget = 0;
-			}
-			if (axis.y < 0)
-			{
-				angleTarget = -angleTarget;
-			}
-			if (modelSelected == 1)
-			{
-				angleTarget -= glm::radians(90.0);
-			}
-			camera3P->setAngleTarget(angleTarget);
-			camera3P->setCameraTarget(target);
-			camera3P->updateCamera();
-
-			view = camera3P->getViewMatrix();
+			// La columna 3 contiene la posición del modelo
+			target = modelMatrixDart[3];
+			angleTarget = glm::angle(glm::quat_cast(modelMatrixDart));
+			axis = glm::axis(glm::quat_cast(modelMatrixDart));
 		}
-		else
+		else // (modelSelected == 2)
 		{
-			// glm::mat4 viewMatrixLily = glm::mat4(modelMatrixLily);
-			// viewMatrixLily = glm::scale(viewMatrixLily, glm::vec3(0.02f, 0.02f, 0.02f));
-			target = modelMatrixLily[3];
-			camera1P->setPosition(target + glm::vec3(0.0, 2.9, 0.0));
-			camera1P->setCameraTarget(target + glm::vec3(0.0, 10.0, 0.0));
-			camera1P->updateCamera();
-			view = camera1P->getViewMatrix();
+			target = modelMatrixMayow[3];
+			angleTarget = glm::angle(glm::quat_cast(modelMatrixMayow));
+			axis = glm::axis(glm::quat_cast(modelMatrixMayow));
 		}
+		if(std::isnan(angleTarget))
+		{
+			angleTarget = 0;
+		}
+		if(axis.y < 0)
+		{
+			angleTarget = -angleTarget;
+		}
+		if (modelSelected == 1)
+		{
+			angleTarget -= glm::radians(90.0);
+		}
+		camera -> setAngleTarget(angleTarget);
+		camera -> setCameraTarget(target);
+		camera -> updateCamera();
+
+		glm::mat4 view = camera->getViewMatrix();
 
 		// Settea la matriz de vista y projection al shader con solo color
 		shader.setMatrix4("projection", 1, false, glm::value_ptr(projection));
@@ -1208,15 +1110,14 @@ void applicationLoop()
 		/*******************************************
 		 * Propiedades Luz direccional
 		 *******************************************/
-		float sol_ambient = 0.2;
-		shaderMulLighting.setVectorFloat3("viewPos", glm::value_ptr(camera3P->getPosition()));
-		shaderMulLighting.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(sol_ambient, sol_ambient, sol_ambient)));
+		shaderMulLighting.setVectorFloat3("viewPos", glm::value_ptr(camera->getPosition()));
+		shaderMulLighting.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(0.05, 0.05, 0.05)));
 		shaderMulLighting.setVectorFloat3("directionalLight.light.diffuse", glm::value_ptr(glm::vec3(0.3, 0.3, 0.3)));
 		shaderMulLighting.setVectorFloat3("directionalLight.light.specular", glm::value_ptr(glm::vec3(0.4, 0.4, 0.4)));
 		shaderMulLighting.setVectorFloat3("directionalLight.direction", glm::value_ptr(glm::vec3(-1.0, 0.0, 0.0)));
 
-		shaderTerrain.setVectorFloat3("viewPos", glm::value_ptr(camera3P->getPosition()));
-		shaderTerrain.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(sol_ambient, sol_ambient, sol_ambient)));
+		shaderTerrain.setVectorFloat3("viewPos", glm::value_ptr(camera->getPosition()));
+		shaderTerrain.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(0.05, 0.05, 0.05)));
 		shaderTerrain.setVectorFloat3("directionalLight.light.diffuse", glm::value_ptr(glm::vec3(0.3, 0.3, 0.3)));
 		shaderTerrain.setVectorFloat3("directionalLight.light.specular", glm::value_ptr(glm::vec3(0.4, 0.4, 0.4)));
 		shaderTerrain.setVectorFloat3("directionalLight.direction", glm::value_ptr(glm::vec3(-1.0, 0.0, 0.0)));
@@ -1528,26 +1429,6 @@ void applicationLoop()
 		modelMatrixCyborgBody = glm::scale(modelMatrixCyborgBody, glm::vec3(0.009f));
 		cyborgModelAnimate.setAnimationIndex(1);
 		cyborgModelAnimate.render(modelMatrixCyborgBody);
-
-		// [Lily]
-		// Para que camine sobre el plano
-		modelMatrixLily[3][1] = terrain.getHeightTerrain(
-			modelMatrixLily[3][0], modelMatrixLily[3][2]);
-		// Para que se incline respecto a la normal
-		glm::vec3 ejey_lily = glm::normalize(
-			terrain.getNormalTerrain(
-				modelMatrixLily[3][0], modelMatrixLily[3][2]));
-		glm::vec3 ejez_lily = glm::normalize(modelMatrixLily[2]);
-		glm::vec3 ejex_lily = glm::normalize(glm::cross(ejey_lily, ejez_lily));
-		ejez_lily = glm::normalize(glm::cross(ejex_lily, ejey_lily));
-		modelMatrixLily[0] = glm::vec4(ejex_lily, 0.0);
-		modelMatrixLily[1] = glm::vec4(ejey_lily, 0.0);
-		modelMatrixLily[2] = glm::vec4(ejez_lily, 0.0);
-		// Renderizado
-		glm::mat4 renderMatrixLily = glm::mat4(modelMatrixLily);
-		renderMatrixLily = glm::scale(renderMatrixLily, glm::vec3(0.02f, 0.02f, 0.02f));
-		modelLily.setAnimationIndex(numAni_Lily);
-		modelLily.render(renderMatrixLily);
 
 		/*******************************************
 		 * Skybox
