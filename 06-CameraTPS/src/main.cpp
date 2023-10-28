@@ -1014,22 +1014,16 @@ bool processInput(bool continueApplication)
 	}
 
 	// Movimientos de [Lily]
-	frontMatrixLily = modelMatrixLily;
 	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-	{	
-		frontMatrixLily = glm::rotate(frontMatrixLily, 0.02f, glm::vec3(0, 1, 0));
-		frontMatrixLily = glm::translate(frontMatrixLily, glm::vec3(0.0, 0.0, 10.0));
-		
+	{
 		modelMatrixLily = glm::rotate(modelMatrixLily, 0.02f, glm::vec3(0, 1, 0));
+		// frontMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.0, 0.0, 10.0));
 		numAni_Lily = 0;
 	}
 	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 	{
-		
-		frontMatrixLily = glm::rotate(frontMatrixLily, -0.02f, glm::vec3(0, 1, 0));
-		frontMatrixLily = glm::translate(frontMatrixLily, glm::vec3(0.0, 0.0, 10.0));
-
 		modelMatrixLily = glm::rotate(modelMatrixLily, -0.02f, glm::vec3(0, 1, 0));
+		// frontMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.0, 0.0, 10.0));
 		numAni_Lily = 0;
 	}
 	else
@@ -1049,6 +1043,7 @@ bool processInput(bool continueApplication)
 	{
 		numAni_Lily = 1;
 	}
+
 	// Cambiar tipo de camara
 	if (enable_camera && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
 	{
@@ -1104,7 +1099,7 @@ void applicationLoop()
 
 	modelMatrixCyborg = glm::translate(modelMatrixCyborg, glm::vec3(5.0f, 0.05, 0.0f));
 
-	frontMatrixLily = modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(20.0f, 0.0, -30.0f));
+	modelMatrixLily = glm::translate(modelMatrixLily, glm::vec3(20.0f, 0.0, -30.0f));
 
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
@@ -1185,10 +1180,9 @@ void applicationLoop()
 		else
 		{
 			target = modelMatrixLily[3];
+			frontMatrixLily = glm::translate(modelMatrixLily, glm::vec3(0.0, 0.0, 10.0));
 
 			camera1P->setPosition(target + glm::vec3(0.0, 2.9, 0.0));
-			// camera1P->setFront(frontMatrixLily[3]);
-			// camera1P->updateCamera();
 			view = camera1P->getViewMatrix_1P(frontMatrixLily[3]);
 			// view = camera1P->getViewMatrix();
 		}
@@ -1555,7 +1549,13 @@ void applicationLoop()
 		glm::mat4 renderMatrixLily = glm::mat4(modelMatrixLily);
 		renderMatrixLily = glm::scale(renderMatrixLily, glm::vec3(0.02f, 0.02f, 0.02f));
 		modelLily.setAnimationIndex(numAni_Lily);
-		modelLily.render(renderMatrixLily);
+		if (modelSelected == 5 && cameraState == false)
+		{
+		}
+		else
+		{
+			modelLily.render(renderMatrixLily);
+		}
 
 		/*******************************************
 		 * Skybox
